@@ -1,0 +1,92 @@
+"use client";
+
+import { motion } from "motion/react";
+import { Zap, Sparkles } from "lucide-react";
+import { RevealWords } from "../ui/RevealWords";
+import { ToastPreview } from "../ui/ToastPreview";
+import { MagneticButton } from "../ui/MagneticButton";
+import { basicVariants } from "../../lib/toast-demos";
+
+export function Hero() {
+  return (
+    <section className="hero">
+      {/* Left col */}
+      <div>
+        <motion.div
+          className="eyebrow"
+          initial={{ opacity: 0, y: 15 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.15, ease: [0.22, 1, 0.36, 1] }}
+        >
+          <motion.div
+            animate={{ rotate: [0, 15, -15, 0] }}
+            transition={{ duration: 1.5, delay: 1.5, repeat: Infinity, repeatDelay: 4 }}
+          >
+            <Zap className="size-3" />
+          </motion.div>
+          24 patterns · zero guesswork · ship faster
+        </motion.div>
+
+        <h1 className="h1">
+          <RevealWords text="Every toast" delay={0.25} />
+          <br />
+          <RevealWords text="pattern you'll" delay={0.4} />
+          <br />
+          <motion.em
+            initial={{ opacity: 0, y: 16, filter: "blur(8px)" }}
+            animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+            transition={{
+              duration: 0.65,
+              delay: 0.8,
+              ease: [0.22, 1, 0.36, 1],
+            }}
+          >
+            ever need.
+          </motion.em>
+        </h1>
+
+        <motion.p
+          className="hero-body"
+          initial={{ opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.55, delay: 0.95, ease: [0.22, 1, 0.36, 1] }}
+        >
+          The complete reference for <strong>Sonner</strong> — the most
+          precise React notification library. 24 battle-tested patterns
+          spanning async pipelines, multi-step flows, real-world auth,
+          e-commerce, and collaborative UX.{" "}
+          <strong>Click any card to fire it live.</strong>
+        </motion.p>
+
+        <motion.div
+          className="hero-row"
+          initial={{ opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 1.1, ease: [0.22, 1, 0.36, 1] }}
+        >
+          <MagneticButton variant="primary" onClick={basicVariants}>
+            <motion.div
+              animate={{ rotate: [0, 180, 360] }}
+              transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
+            >
+              <Sparkles className="size-4" />
+            </motion.div>
+            Fire first toast
+          </MagneticButton>
+          <span className="hero-note">
+            scroll to explore all 24 patterns →
+          </span>
+        </motion.div>
+      </div>
+
+      {/* Right col — live toast stack */}
+      <motion.div
+        initial={{ opacity: 0, x: 40 }}
+        animate={{ opacity: 1, x: 0 }}
+        transition={{ duration: 0.7, delay: 0.4, ease: [0.22, 1, 0.36, 1] }}
+      >
+        <ToastPreview />
+      </motion.div>
+    </section>
+  );
+}
