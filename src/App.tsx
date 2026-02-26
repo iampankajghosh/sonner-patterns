@@ -1,7 +1,15 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
-import { motion, useInView, AnimatePresence } from "motion/react";
+import { useState, useEffect, useRef, useCallback } from "react";
+import {
+  motion,
+  useInView,
+  AnimatePresence,
+  useMotionValue,
+  useTransform,
+  useSpring,
+  useScroll,
+} from "motion/react";
 import {
   Bell,
   Upload,
@@ -35,6 +43,9 @@ import {
   UserCheck,
   Plug,
   Trophy,
+  Check,
+  Clipboard,
+  ClipboardCheck,
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -123,14 +134,8 @@ function promiseToast() {
 function promiseWithDescription() {
   toast.promise(new Promise<void>((r) => setTimeout(r, 2500)), {
     loading: "Syncing workspace…",
-    success: {
-      title: "Sync complete",
-      description: "All changes saved to the cloud.",
-    },
-    error: {
-      title: "Sync failed",
-      description: "Check your connection and retry.",
-    },
+    success: "Sync complete — all changes saved to the cloud.",
+    error: "Sync failed — check your connection and retry.",
   });
 }
 
@@ -436,11 +441,8 @@ function errorWithRetry() {
       {
         loading: `Attempt ${attempts} of 3…`,
         success: "Data fetched after retries!",
-        error: (e) => ({
-          title: e.message,
-          description:
-            attempts < 3 ? "Retrying automatically…" : "All retries exhausted.",
-        }),
+        error: (e) => 
+          `${e.message} — ${attempts < 3 ? "Retrying automatically…" : "All retries exhausted."}`,
       },
     );
     if (attempts < 3) setTimeout(tryFetch, 1900);
@@ -832,37 +834,80 @@ const GROUPS = [
   },
 ] as const;
 
-// ─── Animated counter ─────────────────────────────────────────────────────────
-function AnimatedCounter({
-  target,
-  suffix = "",
-}: {
-  target: number;
-  suffix?: string;
-}) {
-  const [count, setCount] = useState(0);
-  const ref = useRef<HTMLSpanElement>(null);
-  const inView = useInView(ref, { once: true });
+// ─── Scroll progress bar ──────────────────────────────────────────────────────
+function ScrollProgress() {
+  const { scrollYProgress } = useScroll();
+  const scaleX = useSpring(scrollYProgress, {
+    stiffness: 100,
+    damping: 30,
+    restDelta: 0.001,
+  });
+  return <motion.div className="scroll-progress" style={{ scaleX }} />;
+}
+
+// ─── Cursor glow ──────────────────────────────────────────────────────────────
+function CursorGlow() {
+  const x = useMotionValue(-1000);
+  const y = useMotionValue(-1000);
+  const smoothX = useSpring(x, { stiffness: 60, damping: 30 });
+  const smoothY = useSpring(y, { stiffness: 60, damping: 30 });
+
   useEffect(() => {
-    if (!inView) return;
-    const dur = 1400;
-    const start = Date.now();
-    const tick = () => {
-      const p = Math.min((Date.now() - start) / dur, 1);
-      setCount(Math.floor((1 - Math.pow(1 - p, 3)) * target));
-      if (p < 1) requestAnimationFrame(tick);
+    const handler = (e: MouseEvent) => {
+      x.set(e.clientX);
+      y.set(e.clientY);
     };
-    requestAnimationFrame(tick);
-  }, [inView, target]);
+    window.addEventListener("mousemove", handler);
+    return () => window.removeEventListener("mousemove", handler);
+  }, [x, y]);
+
   return (
-    <span ref={ref}>
-      {count}
-      {suffix}
-    </span>
+    <motion.div
+      className="cursor-glow"
+      style={{ left: smoothX, top: smoothY }}
+    />
   );
 }
 
-// ─── Pulse button — scale only, zero layout shift ────────────────────────────
+// AnimatedCounter removed — stats section no longer used
+
+// ─── Logo with language swap ──────────────────────────────────────────────────
+function Logo() {
+  const [isHindi, setIsHindi] = useState(false);
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setIsHindi((prev) => !prev);
+    }, 4500);
+    return () => clearInterval(timer);
+  }, []);
+
+  return (
+    <motion.div
+      className="logo"
+      whileHover={{ x: 2 }}
+      transition={{ type: "spring", stiffness: 300, damping: 20 }}
+    >
+      <div className="logo-pip" />
+      <div style={{ position: "relative", height: "14px", overflow: "hidden", display: "flex", alignItems: "center" }}>
+        <AnimatePresence mode="wait">
+          <motion.span
+            key={isHindi ? "hi" : "en"}
+            initial={{ y: 8, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            exit={{ y: -8, opacity: 0 }}
+            transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+            style={{ display: "inline-block", whiteSpace: "nowrap" }}
+          >
+            {isHindi ? "सोनर पैटर्न" : "sonner patterns"}
+          </motion.span>
+        </AnimatePresence>
+      </div>
+    </motion.div>
+  );
+}
+
+// ─── Magnetic button with ripple ──────────────────────────────────────────────
 function MagneticButton({
   children,
   onClick,
@@ -873,28 +918,78 @@ function MagneticButton({
   variant?: "ghost" | "primary";
 }) {
   const [fired, setFired] = useState(false);
+  const [ripple, setRipple] = useState<{ x: number; y: number } | null>(null);
+  const buttonRef = useRef<HTMLButtonElement>(null);
+
+  const handleClick = useCallback(
+    (e: React.MouseEvent<HTMLButtonElement>) => {
+      setFired(true);
+      onClick();
+      setTimeout(() => setFired(false), 700);
+
+      // Ripple effect
+      if (buttonRef.current) {
+        const rect = buttonRef.current.getBoundingClientRect();
+        setRipple({ x: e.clientX - rect.left, y: e.clientY - rect.top });
+        setTimeout(() => setRipple(null), 600);
+      }
+    },
+    [onClick],
+  );
+
   return (
     <motion.button
-      onClick={() => {
-        setFired(true);
-        onClick();
-        setTimeout(() => setFired(false), 650);
-      }}
-      whileHover={{ scale: 1.04 }}
-      whileTap={{ scale: 0.95 }}
-      transition={{ type: "spring", stiffness: 500, damping: 30 }}
+      ref={buttonRef}
+      onClick={handleClick}
+      whileTap={{ y: 0 }}
+      transition={{ type: "spring", stiffness: 500, damping: 28 }}
       className={
         variant === "primary"
           ? "btn-primary"
-          : `btn-ghost${fired ? "btn-fired" : ""}`
+          : `btn-ghost ${fired ? "btn-fired" : ""}`
       }
+      style={{ position: "relative", overflow: "hidden" }}
     >
-      {fired && variant === "ghost" ? "✦ fired" : children}
+      <AnimatePresence>
+        {ripple && (
+          <motion.span
+            key={`${ripple.x}-${ripple.y}`}
+            initial={{ scale: 0, opacity: 0.35 }}
+            animate={{ scale: 4, opacity: 0 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+            style={{
+              position: "absolute",
+              left: ripple.x - 10,
+              top: ripple.y - 10,
+              width: 20,
+              height: 20,
+              borderRadius: "50%",
+              background:
+                variant === "primary"
+                  ? "rgba(0,0,0,0.15)"
+                  : "rgba(200,241,53,0.2)",
+              pointerEvents: "none",
+            }}
+          />
+        )}
+      </AnimatePresence>
+      {fired && variant === "ghost" ? (
+        <motion.span
+          initial={{ opacity: 0, scale: 0.8 }}
+          animate={{ opacity: 1, scale: 1 }}
+          style={{ display: "inline-flex", alignItems: "center", gap: 4 }}
+        >
+          <Check className="size-3" /> fired
+        </motion.span>
+      ) : (
+        children
+      )}
     </motion.button>
   );
 }
 
-// ─── Demo card ────────────────────────────────────────────────────────────────
+// ─── Demo card with tilt + shine ──────────────────────────────────────────────
 function DemoCard({
   group,
   index,
@@ -903,30 +998,68 @@ function DemoCard({
   index: number;
 }) {
   const ref = useRef<HTMLDivElement>(null);
-  const inView = useInView(ref, { once: true, margin: "-60px" });
+  const inView = useInView(ref, { once: true, margin: "-80px" });
   const Icon = group.icon;
+
+  // Mouse tilt
+  const cardX = useMotionValue(0);
+  const cardY = useMotionValue(0);
+  const rotateX = useTransform(cardY, [-0.5, 0.5], [3, -3]);
+  const rotateY = useTransform(cardX, [-0.5, 0.5], [-3, 3]);
+  const springRotateX = useSpring(rotateX, { stiffness: 200, damping: 20 });
+  const springRotateY = useSpring(rotateY, { stiffness: 200, damping: 20 });
+
+  const handleMouseMove = (e: React.MouseEvent) => {
+    if (!ref.current) return;
+    const rect = ref.current.getBoundingClientRect();
+    cardX.set((e.clientX - rect.left) / rect.width - 0.5);
+    cardY.set((e.clientY - rect.top) / rect.height - 0.5);
+  };
+
+  const handleMouseLeave = () => {
+    cardX.set(0);
+    cardY.set(0);
+  };
+
   return (
     <motion.div
       ref={ref}
       className="demo-card"
-      initial={{ opacity: 0 }}
-      animate={inView ? { opacity: 1 } : {}}
-      transition={{ duration: 0.32, delay: (index % 3) * 0.055 }}
+      onMouseMove={handleMouseMove}
+      onMouseLeave={handleMouseLeave}
+      initial={{ opacity: 0, y: 30 }}
+      animate={
+        inView ? { opacity: 1, y: 0 } : {}
+      }
+      transition={{
+        duration: 0.5,
+        delay: (index % 3) * 0.08,
+        ease: [0.22, 1, 0.36, 1],
+      }}
+      style={{
+        rotateX: springRotateX,
+        rotateY: springRotateY,
+        transformStyle: "preserve-3d",
+        perspective: 800,
+      }}
     >
       <div className="card-top">
-        <div
+        <motion.div
           className="card-icon-wrap"
           style={{ "--tag-c": group.tagColor } as React.CSSProperties}
+          whileHover={{ rotate: [0, -8, 8, -4, 0] }}
+          transition={{ duration: 0.5 }}
         >
           <Icon className="size-3.5" style={{ color: group.tagColor }} />
-        </div>
+        </motion.div>
         <span className="card-id">{group.id}</span>
-        <span
+        <motion.span
           className="card-tag"
           style={{ color: group.tagColor, borderColor: group.tagColor + "30" }}
+          transition={{ type: "spring", stiffness: 400, damping: 20 }}
         >
           {group.tag}
-        </span>
+        </motion.span>
       </div>
       <h3 className="card-title">{group.label}</h3>
       <p className="card-desc">{group.desc}</p>
@@ -949,9 +1082,13 @@ function RevealWords({ text, delay = 0 }: { text: string; delay?: number }) {
       {text.split(" ").map((w, i) => (
         <motion.span
           key={i}
-          initial={{ opacity: 0, filter: "blur(6px)" }}
-          animate={{ opacity: 1, filter: "blur(0px)" }}
-          transition={{ duration: 0.5, delay: delay + i * 0.07 }}
+          initial={{ opacity: 0, y: 14, filter: "blur(8px)" }}
+          animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+          transition={{
+            duration: 0.55,
+            delay: delay + i * 0.08,
+            ease: [0.22, 1, 0.36, 1],
+          }}
           style={{ display: "inline-block", marginRight: "0.28em" }}
         >
           {w}
@@ -965,117 +1102,53 @@ function RevealWords({ text, delay = 0 }: { text: string; delay?: number }) {
 const PREVIEW_TOASTS = [
   {
     type: "success",
-    title: "Deployment complete 🚀",
-    desc: "myapp.vercel.app is live",
-    action: "View site",
+    title: "Deployment complete",
+    desc: "v2.0 is now live on Vercel",
+    action: "View app",
     delay: 0,
   },
   {
-    type: "default",
-    title: "Rahul started editing",
-    desc: "components/Button.tsx",
+    type: "loading",
+    title: "Syncing workspace",
+    desc: "Optimizing 1,204 assets",
     action: null,
     delay: 0.6,
   },
   {
     type: "error",
-    title: "Build failed",
-    desc: "TypeScript error on line 42",
-    action: "See log",
+    title: "Payment failed",
+    desc: "Card ••4242 was declined",
+    action: "Retry",
     delay: 1.2,
   },
   {
     type: "warning",
-    title: "Storage at 92%",
-    desc: "15 GB quota almost reached",
-    action: "Upgrade",
+    title: "Storage limit reached",
+    desc: "Upgrade to prevent data loss",
+    action: "Buy more",
     delay: 1.8,
   },
   {
     type: "info",
-    title: "v4.1.0 available",
-    desc: "14 new components, 3 fixes",
-    action: "Update",
+    title: "New collab session",
+    desc: "Aryan and 2 others joined",
+    action: "Review",
     delay: 2.4,
   },
 ] as const;
 
 const TYPE_ICONS: Record<string, React.ReactNode> = {
-  success: (
-    <svg
-      className="tp-icon"
-      width="16"
-      height="16"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-    >
-      <path d="M22 12A10 10 0 1 1 2 12a10 10 0 0 1 20 0z" />
-      <path d="M8 12.5l2.5 2.5 5-6" />
-    </svg>
-  ),
-  error: (
-    <svg
-      className="tp-icon"
-      width="16"
-      height="16"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-    >
-      <circle cx="12" cy="12" r="10" />
-      <path d="M15 9l-6 6M9 9l6 6" />
-    </svg>
-  ),
-  warning: (
-    <svg
-      className="tp-icon"
-      width="16"
-      height="16"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-    >
-      <circle cx="12" cy="12" r="10" />
-      <path d="M12 8v4M12 16v.5" />
-    </svg>
-  ),
-  info: (
-    <svg
-      className="tp-icon"
-      width="16"
-      height="16"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-    >
-      <circle cx="12" cy="12" r="10" />
-      <path d="M12 11v5M12 8v.5" />
-    </svg>
-  ),
-  default: (
-    <svg
-      className="tp-icon"
-      width="16"
-      height="16"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-    >
-      <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 0 1-3.46 0" />
-    </svg>
-  ),
+  success: <Check className="tp-icon size-4" />,
+  error: <Trash2 className="tp-icon size-4" />,
+  warning: <Bell className="tp-icon size-4" />,
+  info: <Users className="tp-icon size-4" />,
+  loading: <RefreshCw className="tp-icon size-4 animate-spin-slow" />,
 };
 
 function ToastPreview() {
   const [progress, setProgress] = useState(0);
+  const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
 
-  // Loop a progress bar animation on the first card
   useEffect(() => {
     let frame: number;
     let start: number | null = null;
@@ -1097,9 +1170,20 @@ function ToastPreview() {
         <motion.div
           key={t.title}
           className={`tp-card ${t.type}`}
-          initial={{ opacity: 0, filter: "blur(4px)" }}
-          animate={{ opacity: 1, filter: "blur(0px)" }}
-          transition={{ duration: 0.5, delay: t.delay + 0.4 }}
+          initial={{ opacity: 0, x: 30, filter: "blur(6px)" }}
+          animate={{ opacity: 1, x: 0, filter: "blur(0px)" }}
+          transition={{
+            duration: 0.6,
+            delay: t.delay + 0.5,
+            ease: [0.22, 1, 0.36, 1],
+          }}
+          whileHover={{ x: 6 }}
+          onHoverStart={() => setHoveredIndex(i)}
+          onHoverEnd={() => setHoveredIndex(null)}
+          style={{
+            opacity: hoveredIndex !== null && hoveredIndex !== i ? 0.5 : 1,
+            transition: "opacity 0.3s ease",
+          }}
         >
           {TYPE_ICONS[t.type]}
           <div className="tp-body">
@@ -1121,213 +1205,115 @@ function ToastPreview() {
   );
 }
 
+// ─── Copy button with slide-up animation ─────────────────────────────────────
+function CopyButton() {
+  const [copied, setCopied] = useState(false);
+
+  return (
+    <motion.button
+      className="btn-ghost"
+      onClick={() => {
+        navigator.clipboard?.writeText("npm install sonner");
+        setCopied(true);
+        toast.success("Copied to clipboard", {
+          duration: 2000,
+        });
+        setTimeout(() => setCopied(false), 2200);
+      }}
+      whileTap={{ y: 0 }}
+      transition={{ type: "spring", stiffness: 500, damping: 28 }}
+      style={{ position: "relative", overflow: "hidden" }}
+    >
+      <div className="copy-slide">
+        <AnimatePresence mode="wait">
+          {copied ? (
+            <motion.div
+              key="done"
+              initial={{ y: 20, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              exit={{ y: -20, opacity: 0 }}
+              transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
+              style={{ display: "inline-flex", alignItems: "center", gap: 4, color: "#4ade80" }}
+            >
+              <ClipboardCheck className="size-3" />
+              Copied!
+            </motion.div>
+          ) : (
+            <motion.div
+              key="idle"
+              initial={{ y: 20, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              exit={{ y: -20, opacity: 0 }}
+              transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
+              style={{ display: "inline-flex", alignItems: "center", gap: 4 }}
+            >
+              <Clipboard className="size-3" />
+              Copy
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
+    </motion.button>
+  );
+}
+
 // ─── Main ─────────────────────────────────────────────────────────────────────
 export default function ToastPlayground() {
   const [mounted, setMounted] = useState(false);
   const [filter, setFilter] = useState("all");
+  const [navScrolled, setNavScrolled] = useState(false);
+
   useEffect(() => setMounted(true), []);
+
+  // Nav scroll detection
+  useEffect(() => {
+    const handler = () => setNavScrolled(window.scrollY > 40);
+    window.addEventListener("scroll", handler, { passive: true });
+    return () => window.removeEventListener("scroll", handler);
+  }, []);
+
   const tags = ["all", ...Array.from(new Set(GROUPS.map((g) => g.tag)))];
   const filtered =
     filter === "all" ? [...GROUPS] : GROUPS.filter((g) => g.tag === filter);
+
   if (!mounted) return null;
 
   return (
     <>
-      <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=DM+Mono:wght@400;500&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600&display=swap');
-        *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-        :root{
-          --bg:#0b0b0c;--surf:#131314;--border:rgba(255,255,255,0.07);--borderhi:rgba(255,255,255,0.13);
-          --text:#ede9e3;--text2:#918e88;--text3:#4f4d4a;
-          --accent:#c8f135;--accent2:#e2ff7a;--glow:rgba(200,241,53,0.12);
-          --mono:'DM Mono',monospace;--sans:'DM Sans',sans-serif;--disp:'Playfair Display',serif;--r:10px;
-        }
-        body{background:var(--bg);color:var(--text);font-family:var(--sans);-webkit-font-smoothing:antialiased;overflow-x:hidden}
-
-        /* grain */
-        body::after{content:'';position:fixed;inset:0;pointer-events:none;z-index:9999;opacity:0.022;
-          background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-          background-size:180px}
-
-        .page{position:relative;min-height:100vh}
-        .page::before{content:'';position:fixed;top:-220px;left:50%;transform:translateX(-50%);
-          width:1000px;height:700px;
-          background:radial-gradient(ellipse,rgba(200,241,53,0.045) 0%,transparent 68%);
-          pointer-events:none;z-index:0}
-
-        .wrap{position:relative;z-index:1;max-width:1160px;margin:0 auto;padding:0 36px}
-
-        /* nav */
-        .nav{display:flex;align-items:center;justify-content:space-between;padding:22px 0;border-bottom:1px solid var(--border)}
-        .logo{font-family:var(--mono);font-size:12px;color:var(--text3);display:flex;align-items:center;gap:10px;letter-spacing:0.04em}
-        .logo-pip{width:6px;height:6px;border-radius:50%;background:var(--accent);box-shadow:0 0 8px rgba(200,241,53,0.6)}
-        .nav-right{display:flex;gap:8px}
-        .nav-pill{font-family:var(--mono);font-size:11px;color:var(--text3);border:1px solid var(--border);
-          background:none;padding:5px 14px;border-radius:999px;cursor:pointer;text-decoration:none;
-          transition:all .15s;display:inline-block}
-        .nav-pill:hover{color:var(--text2);border-color:var(--borderhi);background:var(--surf)}
-
-        /* hero */
-        .hero{padding:88px 0 64px;display:grid;grid-template-columns:1fr 420px;gap:64px;align-items:center;max-width:100%}
-        @media(max-width:1000px){.hero{grid-template-columns:1fr;gap:56px}}
-        .eyebrow{display:inline-flex;align-items:center;gap:8px;font-family:var(--mono);
-          font-size:11px;letter-spacing:0.1em;text-transform:uppercase;color:var(--accent);
-          margin-bottom:32px;padding:6px 14px;border:1px solid rgba(200,241,53,0.22);border-radius:4px;background:var(--glow)}
-        .h1{font-family:var(--disp);font-size:clamp(46px,6.5vw,86px);font-weight:900;
-          line-height:1.0;letter-spacing:-0.025em;color:var(--text);margin-bottom:28px}
-        .h1 em{font-style:italic;background:linear-gradient(120deg,var(--accent),var(--accent2));
-          -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
-        .hero-body{font-size:clamp(16px,1.8vw,19px);color:var(--text2);line-height:1.7;max-width:580px;margin-bottom:44px}
-        .hero-body strong{color:var(--text);font-weight:600}
-        .hero-row{display:flex;align-items:center;gap:20px;flex-wrap:wrap}
-        .hero-note{font-family:var(--mono);font-size:12px;color:var(--text3)}
-
-        /* buttons */
-        .btn-primary{display:inline-flex;align-items:center;gap:8px;background:var(--accent);color:#fff;
-          font-family:var(--sans);font-size:14px;font-weight:600;padding:12px 26px;border:none;
-          border-radius:var(--r);cursor:pointer;letter-spacing:.01em;white-space:nowrap;
-          color:#0b0b0c;box-shadow:0 0 28px var(--glow),0 2px 8px rgba(0,0,0,.35);transition:box-shadow .2s,background .2s}
-        .btn-primary:hover{background:#d5f545;box-shadow:0 0 44px rgba(200,241,53,.28),0 4px 16px rgba(0,0,0,.4)}
-        .btn-ghost{font-family:var(--mono);font-size:11px;font-weight:500;color:var(--text2);
-          border:1px solid var(--borderhi);background:none;padding:7px 14px;border-radius:6px;
-          cursor:pointer;transition:all .15s;white-space:nowrap;letter-spacing:0.02em}
-        .btn-ghost:hover,.btn-fired{color:var(--accent)!important;border-color:rgba(200,241,53,.32)!important;background:var(--glow)!important}
-
-        /* stats */
-        .stats{display:grid;grid-template-columns:repeat(4,1fr);border:1px solid var(--border);
-          border-radius:var(--r);overflow:hidden;background:var(--surf);margin:0 0 72px}
-        .stat{padding:28px 24px;border-right:1px solid var(--border)}
-        .stat:last-child{border-right:none}
-        .stat-n{font-family:var(--disp);font-size:clamp(30px,3.5vw,44px);font-weight:700;line-height:1;
-          display:block;margin-bottom:6px;
-          background:linear-gradient(120deg,var(--text) 40%,var(--accent));
-          -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
-        .stat-l{font-family:var(--mono);font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:0.12em}
-
-        /* install */
-        .install{display:flex;align-items:stretch;border:1px solid var(--border);border-radius:var(--r);
-          overflow:hidden;background:var(--surf);margin-bottom:72px}
-        .install-lbl{font-family:var(--mono);font-size:10px;color:var(--text3);text-transform:uppercase;
-          letter-spacing:0.12em;padding:18px 20px;border-right:1px solid var(--border);
-          display:flex;align-items:center;white-space:nowrap}
-        .install-cmd{font-family:var(--mono);font-size:14px;color:var(--accent2);
-          padding:18px 24px;flex:1;display:flex;align-items:center;letter-spacing:0.02em}
-        .install-copy{padding:12px 16px;border-left:1px solid var(--border);display:flex;align-items:center}
-
-        /* section head */
-        .sec-head{margin-bottom:36px}
-        .sec-tag{font-family:var(--mono);font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:0.14em;margin-bottom:10px}
-        .sec-h2{font-family:var(--disp);font-size:clamp(26px,3vw,38px);font-weight:700;line-height:1.1;color:var(--text)}
-        .sec-h2 em{font-style:italic;color:var(--accent2)}
-
-        /* filters */
-        .filters{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:32px}
-        .filter-lbl{font-family:var(--mono);font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:0.1em;margin-right:4px}
-        .filter-btn{font-family:var(--mono);font-size:11px;color:var(--text3);border:1px solid var(--border);
-          background:none;padding:4px 12px;border-radius:4px;cursor:pointer;transition:all .15s;letter-spacing:0.04em}
-        .filter-btn:hover{color:var(--text2);border-color:var(--borderhi)}
-        .filter-btn.on{color:var(--accent);border-color:rgba(200,241,53,.28);background:var(--glow)}
-
-        /* grid */
-        .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--border);
-          border:1px solid var(--border);border-radius:var(--r);overflow:hidden;margin-bottom:100px}
-
-        /* card */
-        .demo-card{background:var(--bg);padding:26px 22px;display:flex;flex-direction:column;gap:12px;transition:background .22s,box-shadow .25s}
-        .demo-card:hover{background:var(--surf);box-shadow:inset 0 0 0 1px rgba(200,241,53,0.12)}
-        .card-top{display:flex;align-items:center;gap:10px}
-        .card-icon-wrap{width:28px;height:28px;border-radius:7px;flex-shrink:0;display:flex;align-items:center;justify-content:center;
-          background:color-mix(in srgb,var(--tag-c,#fff) 9%,transparent);
-          border:1px solid color-mix(in srgb,var(--tag-c,#fff) 18%,transparent)}
-        .card-id{font-family:var(--mono);font-size:10px;color:var(--text3);flex:1}
-        .card-tag{font-family:var(--mono);font-size:9px;letter-spacing:0.08em;text-transform:uppercase;
-          border:1px solid;padding:2px 7px;border-radius:3px;flex-shrink:0}
-        .card-title{font-family:var(--sans);font-size:14px;font-weight:600;color:var(--text);line-height:1.3}
-        .card-desc{font-family:var(--sans);font-size:12.5px;color:var(--text2);line-height:1.6;flex:1}
-        .card-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:2px}
-
-        /* toast preview */
-        .toast-preview{position:relative;display:flex;flex-direction:column;gap:10px;padding:8px 0}
-        .tp-label{font-family:var(--mono);font-size:10px;color:var(--text3);text-transform:uppercase;
-          letter-spacing:0.12em;margin-bottom:4px;display:flex;align-items:center;gap:8px}
-        .tp-label::before{content:'';display:inline-block;width:6px;height:6px;border-radius:50%;
-          background:var(--accent);box-shadow:0 0 6px rgba(200,241,53,0.5)}
-        .tp-card{background:var(--surf);border:1px solid var(--border);border-radius:10px;
-          padding:14px 16px;display:flex;align-items:flex-start;gap:12px;
-          box-shadow:0 4px 24px rgba(0,0,0,0.3)}
-        .tp-card.success .tp-icon{color:#4ade80}
-        .tp-card.error   .tp-icon{color:#f87171}
-        .tp-card.warning .tp-icon{color:#fbbf24}
-        .tp-card.info    .tp-icon{color:#60a5fa}
-        .tp-card.default .tp-icon{color:var(--text2)}
-        .tp-icon{flex-shrink:0;margin-top:1px}
-        .tp-body{flex:1;min-width:0}
-        .tp-title{font-family:var(--sans);font-size:13px;font-weight:600;color:var(--text);
-          white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.3}
-        .tp-desc{font-family:var(--sans);font-size:12px;color:var(--text2);margin-top:2px;
-          white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.4}
-        .tp-action{flex-shrink:0;font-family:var(--mono);font-size:10px;color:var(--accent);
-          border:1px solid rgba(200,241,53,0.25);padding:3px 8px;border-radius:4px;
-          background:rgba(200,241,53,0.06);white-space:nowrap}
-        .tp-bar{height:2px;background:var(--border);border-radius:1px;margin-top:10px;overflow:hidden}
-        .tp-bar-fill{height:100%;background:var(--accent);border-radius:1px;transform-origin:left}
-        @media(max-width:1000px){.toast-preview{display:none}}
-
-        /* footer */
-        .footer{border-top:1px solid var(--border);padding:36px 0 56px;display:flex;align-items:flex-start;
-          justify-content:space-between;flex-wrap:wrap;gap:16px}
-        .footer-l{font-family:var(--mono);font-size:11px;color:var(--text3);line-height:1.9}
-        .footer-l a{color:var(--text2);text-decoration:none}
-        .footer-l a:hover{color:var(--accent)}
-        .footer-r{font-family:var(--mono);font-size:11px;color:var(--text3)}
-
-        /* responsive */
-        @media(max-width:880px){.grid{grid-template-columns:repeat(2,1fr)}}
-        @media(max-width:520px){.grid{grid-template-columns:1fr}}
-        @media(max-width:600px){
-          .wrap{padding:0 20px}
-          .hero{padding:56px 0 44px}
-          .stats{grid-template-columns:repeat(2,1fr)}
-          .stat:nth-child(2){border-right:none}
-          .stat:nth-child(3){border-right:1px solid var(--border);border-top:1px solid var(--border)}
-          .stat:nth-child(4){border-top:1px solid var(--border)}
-          .nav-right{display:none}
-          .install{flex-direction:column}
-          .install-lbl{border-right:none;border-bottom:1px solid var(--border)}
-          .install-copy{border-left:none;border-top:1px solid var(--border)}
-        }
-      `}</style>
+      <ScrollProgress />
+      <CursorGlow />
 
       <div className="page">
         <div className="wrap">
           {/* Nav */}
           <motion.nav
-            className="nav"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.38 }}
+            className={`nav ${navScrolled ? "scrolled" : ""}`}
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
           >
-            <div className="logo">
-              <div className="logo-pip" />
-              toast · playground
-            </div>
+            <Logo />
+
             <div className="nav-right">
-              <a
+              <motion.a
                 className="nav-pill"
-                href="https://sonner.emilkowalski.me/"
+                href="https://sonner.emilkowal.ski/"
                 target="_blank"
                 rel="noopener noreferrer"
+                whileTap={{ y: 0 }}
               >
-                Sonner docs ↗
-              </a>
-              <a
-                className="nav-pill"
-                href="https://github.com/emilkowalski/sonner"
+                Docs ↗
+              </motion.a>
+              <motion.a
+                className="nav-pill-star"
+                href="https://github.com/iampankajghosh/sonner-patterns"
                 target="_blank"
                 rel="noopener noreferrer"
+                whileTap={{ y: 0 }}
               >
-                GitHub ↗
-              </a>
+                <Star className="size-3" />
+                Star on GitHub
+              </motion.a>
             </div>
           </motion.nav>
 
@@ -1337,23 +1323,32 @@ export default function ToastPlayground() {
             <div>
               <motion.div
                 className="eyebrow"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ duration: 0.38, delay: 0.12 }}
+                initial={{ opacity: 0, y: 15 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: 0.15, ease: [0.22, 1, 0.36, 1] }}
               >
-                <Zap className="size-3" />
+                <motion.div
+                  animate={{ rotate: [0, 15, -15, 0] }}
+                  transition={{ duration: 1.5, delay: 1.5, repeat: Infinity, repeatDelay: 4 }}
+                >
+                  <Zap className="size-3" />
+                </motion.div>
                 24 patterns · zero guesswork · ship faster
               </motion.div>
 
               <h1 className="h1">
-                <RevealWords text="Every toast" delay={0.2} />
+                <RevealWords text="Every toast" delay={0.25} />
                 <br />
-                <RevealWords text="pattern you'll" delay={0.34} />
+                <RevealWords text="pattern you'll" delay={0.4} />
                 <br />
                 <motion.em
-                  initial={{ opacity: 0, filter: "blur(6px)" }}
-                  animate={{ opacity: 1, filter: "blur(0px)" }}
-                  transition={{ duration: 0.55, delay: 0.72 }}
+                  initial={{ opacity: 0, y: 16, filter: "blur(8px)" }}
+                  animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+                  transition={{
+                    duration: 0.65,
+                    delay: 0.8,
+                    ease: [0.22, 1, 0.36, 1],
+                  }}
                 >
                   ever need.
                 </motion.em>
@@ -1361,9 +1356,9 @@ export default function ToastPlayground() {
 
               <motion.p
                 className="hero-body"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ duration: 0.46, delay: 0.88 }}
+                initial={{ opacity: 0, y: 16 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.55, delay: 0.95, ease: [0.22, 1, 0.36, 1] }}
               >
                 The complete reference for <strong>Sonner</strong> — the most
                 precise React notification library. 24 battle-tested patterns
@@ -1374,12 +1369,17 @@ export default function ToastPlayground() {
 
               <motion.div
                 className="hero-row"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ duration: 0.44, delay: 1.04 }}
+                initial={{ opacity: 0, y: 16 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: 1.1, ease: [0.22, 1, 0.36, 1] }}
               >
                 <MagneticButton variant="primary" onClick={basicVariants}>
-                  <Sparkles className="size-4" />
+                  <motion.div
+                    animate={{ rotate: [0, 180, 360] }}
+                    transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
+                  >
+                    <Sparkles className="size-4" />
+                  </motion.div>
                   Fire first toast
                 </MagneticButton>
                 <span className="hero-note">
@@ -1390,99 +1390,100 @@ export default function ToastPlayground() {
 
             {/* Right col — live toast stack */}
             <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ duration: 0.5, delay: 0.3 }}
+              initial={{ opacity: 0, x: 40 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.7, delay: 0.4, ease: [0.22, 1, 0.36, 1] }}
             >
               <ToastPreview />
             </motion.div>
           </section>
 
-          {/* Stats */}
-          <motion.div
-            className="stats"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.44, delay: 1.14 }}
-          >
-            {[
-              { n: 24, s: "", l: "Unique patterns" },
-              { n: 45, s: "+", l: "Live demos" },
-              { n: 100, s: "%", l: "Copy-paste ready" },
-              { n: 0, s: " deps", l: "Beyond sonner" },
-            ].map((s, i) => (
-              <div key={i} className="stat">
-                <span className="stat-n">
-                  <AnimatedCounter target={s.n} suffix={s.s} />
-                </span>
-                <div className="stat-l">{s.l}</div>
-              </div>
-            ))}
-          </motion.div>
-
           {/* Install strip */}
           <motion.div
             className="install"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.4, delay: 1.24 }}
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
           >
             <span className="install-lbl">install</span>
-            <code className="install-cmd">npm install sonner</code>
+            <code className="install-cmd">
+              npm install sonner
+              <span className="install-cursor" />
+            </code>
             <div className="install-copy">
-              <MagneticButton
-                variant="ghost"
-                onClick={() => {
-                  navigator.clipboard?.writeText("npm install sonner");
-                  toast.success("Copied!", {
-                    description: "Run in your project root.",
-                    duration: 2000,
-                  });
-                }}
-              >
-                <Copy className="-mt-px mr-1.5 inline-block size-3" />
-                Copy
-              </MagneticButton>
+              <CopyButton />
             </div>
           </motion.div>
 
           {/* Section head */}
           <motion.div
             className="sec-head"
-            initial={{ opacity: 0 }}
-            whileInView={{ opacity: 1 }}
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            transition={{ duration: 0.4 }}
+            transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
           >
-            <div className="sec-tag">// interactive playground</div>
+            <motion.div
+              className="sec-tag"
+              initial={{ opacity: 0, x: -10 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.4, delay: 0.1 }}
+            >
+              {"// interactive playground"}
+            </motion.div>
             <h2 className="sec-h2">
               Click to fire. <em>Watch and learn.</em>
             </h2>
           </motion.div>
 
           {/* Filters */}
-          <div className="filters">
+          <motion.div
+            className="filters"
+            initial={{ opacity: 0, y: 12 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.45 }}
+          >
             <span className="filter-lbl">filter:</span>
             {tags.map((t) => (
-              <button
+              <motion.button
                 key={t}
-                className={`filter-btn${filter === t ? "on" : ""}`}
+                className={`filter-btn ${filter === t ? "on" : ""}`}
                 onClick={() => setFilter(t)}
+                whileTap={{ y: 0 }}
+                transition={{ type: "spring", stiffness: 400, damping: 20 }}
+                layout
               >
                 {t}
-              </button>
+                {filter === t && (
+                  <motion.div
+                    layoutId="filter-active"
+                    style={{
+                      position: "absolute",
+                      inset: -1,
+                      borderRadius: 6,
+                      border: "1px solid rgba(200,241,53,0.28)",
+                      background: "rgba(200,241,53,0.06)",
+                      zIndex: -1,
+                    }}
+                    transition={{ type: "spring", stiffness: 380, damping: 30 }}
+                  />
+                )}
+              </motion.button>
             ))}
-          </div>
+          </motion.div>
 
           {/* Grid */}
           <AnimatePresence mode="wait">
             <motion.div
               key={filter}
               className="grid"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.22 }}
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -8 }}
+              transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
             >
               {filtered.map((g, i) => (
                 <DemoCard key={g.id} group={g} index={i} />
@@ -1491,7 +1492,13 @@ export default function ToastPlayground() {
           </AnimatePresence>
 
           {/* Footer */}
-          <footer className="footer">
+          <motion.footer
+            className="footer"
+            initial={{ opacity: 0, y: 16 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-40px" }}
+            transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+          >
             <div className="footer-l">
               Add{" "}
               <span
@@ -1499,28 +1506,34 @@ export default function ToastPlayground() {
               >
                 &lt;Toaster /&gt;
               </span>{" "}
-              to your root layout to enable toasts site-wide.
-              <br />
-              Built on{" "}
+              to enable toasts site-wide. Built on{" "}
               <a
-                href="https://sonner.emilkowalski.me/"
+                href="https://sonner.emilkowal.ski/"
                 target="_blank"
                 rel="noopener noreferrer"
               >
                 Sonner
               </a>{" "}
-              by{" "}
+              by Emil Kowalski.
+            </div>
+
+            <div className="footer-r">
               <a
-                href="https://twitter.com/emilkowalski_"
+                href="https://x.com/im_pankajghosh"
                 target="_blank"
                 rel="noopener noreferrer"
+                className="creator-inline"
               >
-                Emil Kowalski
+                <img
+                  src="https://avatars.githubusercontent.com/u/140588883?v=4"
+                  alt="Pankaj Ghosh"
+                  className="creator-avatar"
+                />
+                <span>Pankaj Ghosh</span>
               </a>
-              . Wrapper &amp; playground by you.
+              <span>sonner.patterns · 2026</span>
             </div>
-            <div className="footer-r">toast.playground · 2025</div>
-          </footer>
+          </motion.footer>
         </div>
       </div>
     </>
