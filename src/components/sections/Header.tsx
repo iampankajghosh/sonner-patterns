@@ -10,13 +10,13 @@ interface HeaderProps {
 
 export function Header({ navScrolled }: HeaderProps) {
   return (
-    <header>
-      <motion.nav
-        className={`nav ${navScrolled ? "scrolled" : ""}`}
-        initial={{ opacity: 0, y: -10 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-      >
+    <motion.header
+      className={`nav-header ${navScrolled ? "scrolled" : ""}`}
+      initial={{ opacity: 0, y: -10 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+    >
+      <nav className="nav-inner">
         <Logo />
 
         <div className="nav-right">
@@ -39,10 +39,10 @@ export function Header({ navScrolled }: HeaderProps) {
             aria-label="Star sonner-patterns on GitHub"
           >
             <Star className="size-3" />
-            Star on GitHub
+            <span className="nav-pill-text">Star</span>
           </motion.a>
         </div>
-      </motion.nav>
-    </header>
+      </nav>
+    </motion.header>
   );
 }

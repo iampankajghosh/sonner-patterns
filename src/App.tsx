@@ -30,9 +30,9 @@ export default function ToastPlayground() {
       <CursorGlow />
 
       <div className="page">
-        <div className="wrap">
-          <Header navScrolled={navScrolled} />
+        <Header navScrolled={navScrolled} />
 
+        <div className="wrap">
           <main>
             <Hero />
             <FilterGrid filter={filter} setFilter={setFilter} />

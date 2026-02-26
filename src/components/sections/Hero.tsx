@@ -65,12 +65,7 @@ export function Hero() {
           transition={{ duration: 0.5, delay: 1.1, ease: [0.22, 1, 0.36, 1] }}
         >
           <MagneticButton variant="primary" onClick={basicVariants}>
-            <motion.div
-              animate={{ rotate: [0, 180, 360] }}
-              transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
-            >
-              <Sparkles className="size-4" />
-            </motion.div>
+            <Sparkles className="size-4" />
             Fire first toast
           </MagneticButton>
           <span className="hero-note">
