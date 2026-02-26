@@ -285,7 +285,7 @@ function updateInPlace() {
     () =>
       toast.success("Deployed to production 🚀", {
         id,
-        description: "Live at myapp.vercel.app",
+        description: "Live at deployment.pankajghosh.in",
         duration: 6000,
       }),
     4800,
@@ -327,7 +327,7 @@ function customIcons() {
 function realWorldAuth() {
   _seq = 0;
   seq(() =>
-    toast.success("Welcome back, Aryan 👋", {
+    toast.success("Welcome back, Pankaj 👋", {
       description: "Logged in from Bengaluru, IN.",
       icon: <User className="size-4" />,
     }),
@@ -400,7 +400,7 @@ function realWorldEcommerce() {
 function realWorldCollaboration() {
   _seq = 0;
   seq(() =>
-    toast("Rahul started editing", {
+    toast("Pankaj started editing", {
       icon: <User className="size-4 text-blue-400" />,
       description: "Design tokens — components.json",
     }),
@@ -1103,7 +1103,7 @@ const PREVIEW_TOASTS = [
   {
     type: "success",
     title: "Deployment complete",
-    desc: "v2.0 is now live on Vercel",
+    desc: "v2.0 is now live on pankajghosh.in",
     action: "View app",
     delay: 0,
   },
@@ -1131,7 +1131,7 @@ const PREVIEW_TOASTS = [
   {
     type: "info",
     title: "New collab session",
-    desc: "Aryan and 2 others joined",
+    desc: "Pankaj and 2 others joined",
     action: "Review",
     delay: 2.4,
   },
@@ -1286,36 +1286,42 @@ export default function ToastPlayground() {
       <div className="page">
         <div className="wrap">
           {/* Nav */}
-          <motion.nav
-            className={`nav ${navScrolled ? "scrolled" : ""}`}
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-          >
-            <Logo />
+          <header>
+            <motion.nav
+              className={`nav ${navScrolled ? "scrolled" : ""}`}
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+            >
+              <Logo />
 
-            <div className="nav-right">
-              <motion.a
-                className="nav-pill"
-                href="https://sonner.emilkowal.ski/"
-                target="_blank"
-                rel="noopener noreferrer"
-                whileTap={{ y: 0 }}
-              >
-                Docs ↗
-              </motion.a>
-              <motion.a
-                className="nav-pill-star"
-                href="https://github.com/iampankajghosh/sonner-patterns"
-                target="_blank"
-                rel="noopener noreferrer"
-                whileTap={{ y: 0 }}
-              >
-                <Star className="size-3" />
-                Star on GitHub
-              </motion.a>
-            </div>
-          </motion.nav>
+              <div className="nav-right">
+                <motion.a
+                  className="nav-pill"
+                  href="https://sonner.emilkowal.ski/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  whileTap={{ y: 0 }}
+                  aria-label="View Sonner Documentation"
+                >
+                  Docs ↗
+                </motion.a>
+                <motion.a
+                  className="nav-pill-star"
+                  href="https://github.com/iampankajghosh/sonner-patterns"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  whileTap={{ y: 0 }}
+                  aria-label="Star sonner-patterns on GitHub"
+                >
+                  <Star className="size-3" />
+                  Star on GitHub
+                </motion.a>
+              </div>
+            </motion.nav>
+          </header>
+
+          <main>
 
           {/* Hero */}
           <section className="hero">
@@ -1490,6 +1496,7 @@ export default function ToastPlayground() {
               ))}
             </motion.div>
           </AnimatePresence>
+          </main>
 
           {/* Footer */}
           <motion.footer

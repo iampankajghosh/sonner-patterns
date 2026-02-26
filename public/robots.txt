@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://sonner-patterns.pankajghosh.in/sitemap.xml
