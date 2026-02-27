@@ -11,7 +11,7 @@ export function Hero() {
   return (
     <section className="hero">
       {/* Left col */}
-      <div>
+      <div className="hero-left">
         <motion.div
           className="eyebrow"
           initial={{ opacity: 0, y: 15 }}
@@ -76,6 +76,7 @@ export function Hero() {
 
       {/* Right col — live toast stack */}
       <motion.div
+        className="hero-right"
         initial={{ opacity: 0, x: 40 }}
         animate={{ opacity: 1, x: 0 }}
         transition={{ duration: 0.7, delay: 0.4, ease: [0.22, 1, 0.36, 1] }}

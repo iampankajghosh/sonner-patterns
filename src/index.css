@@ -45,7 +45,7 @@ html {
   --sans: "Inter", sans-serif;
   --disp: "Inter", sans-serif;
   --serif: "Instrument Serif", serif;
-  --r: 12px;
+  --r: 10px;
   --r-sm: 8px;
   --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
   --ease-out-quint: cubic-bezier(0.22, 1, 0.36, 1);
@@ -295,12 +295,13 @@ body::after {
 
 /* ── Hero ──────────────────────────────────────────────────────────────── */
 .hero {
-  padding: 100px 0 72px;
+  padding: 100px 0 80px;
   display: grid;
   grid-template-columns: 1fr 420px;
   gap: 64px;
-  align-items: center;
+  align-items: flex-start;
   max-width: 100%;
+  min-height: 640px;
 }
 
 .eyebrow {
@@ -831,8 +832,13 @@ body::after {
   position: relative;
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  padding: 8px 0;
+  gap: 12px;
+}
+
+.tp-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
 }
 
 .tp-label {
@@ -867,12 +873,10 @@ body::after {
   align-items: center;
   gap: 12px;
   box-shadow: 0 4px 24px rgba(0, 0, 0, 0.3);
-  transition: all 0.3s var(--ease-out-expo);
   cursor: default;
 }
 
 .tp-card:hover {
-  transform: translateX(4px);
   border-color: var(--borderhi);
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
 }
