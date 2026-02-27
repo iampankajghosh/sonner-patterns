@@ -14,28 +14,33 @@ export const PATTERN_CODES: Record<string, PatternCode> = {
     setup: `import { toast } from "sonner";`,
     steps: [
       {
-        title: "Default toast",
-        description: "A plain notification — no icon, no color. Use for neutral messages.",
+        title: "Default Toast",
+        description:
+          "A plain notification — no icon, no color. Use for neutral system messages.",
         code: `toast("Default notification — simple and clean");`,
       },
       {
-        title: "Success toast",
-        description: "Green checkmark. Use after successful operations.",
+        title: "Success Toast",
+        description:
+          "Green checkmark variant. Use for successful operations and confirmations.",
         code: `toast.success("Operation completed successfully!");`,
       },
       {
-        title: "Error toast",
-        description: "Red alert. Use for failed operations.",
+        title: "Error Toast",
+        description:
+          "Red alert variant. Use for failed operations, declines, or critical errors.",
         code: `toast.error("Something went wrong. Please try again.");`,
       },
       {
-        title: "Warning toast",
-        description: "Amber caution. Use for time-sensitive or risky states.",
+        title: "Warning Toast",
+        description:
+          "Amber caution variant. Use for time-sensitive or potentially risky states.",
         code: `toast.warning("Your session expires in 5 minutes.");`,
       },
       {
-        title: "Info toast",
-        description: "Blue informational. Use for passive updates.",
+        title: "Info Toast",
+        description:
+          "Blue informational variant. Use for passive updates and neutral feedback.",
         code: `toast.info("New update available — v3.2.0 is live");`,
       },
     ],
@@ -44,26 +49,29 @@ export const PATTERN_CODES: Record<string, PatternCode> = {
     setup: `import { toast } from "sonner";\nimport { Mail, CreditCard, Upload } from "lucide-react";`,
     steps: [
       {
-        title: "Toast with description & icon",
-        description: "Add supporting text and a custom icon for richer context.",
+        title: "Supporting Descriptions",
+        description:
+          "Add a secondary line of text to provide more detail without overwhelming the user.",
         code: `toast("Email sent", {
   description: "Delivered to 3 recipients.",
   icon: <Mail className="size-4 text-blue-400" />,
 });`,
       },
       {
-        title: "Success with description",
-        description: "Combine a success variant with structured detail.",
+        title: "Rich Success Context",
+        description:
+          "Combine standard variants with structured detail for complex confirmations.",
         code: `toast.success("Payment successful", {
-  description: "₹4,999 charged to Visa ••4242.",
+  description: "$49.00 charged to Visa ••4444.",
   icon: <CreditCard className="size-4" />,
 });`,
       },
       {
-        title: "Error with description",
-        description: "Provide actionable context in error states.",
+        title: "Detailed Error State",
+        description:
+          "Provide actionable context in error states to help users self-correct.",
         code: `toast.error("Upload failed", {
-  description: "File exceeds the 25 MB limit.",
+  description: "File exceeds the 25MB limit.",
   icon: <Upload className="size-4" />,
 });`,
       },
@@ -73,22 +81,25 @@ export const PATTERN_CODES: Record<string, PatternCode> = {
     setup: `import { toast } from "sonner";`,
     steps: [
       {
-        title: "Flash duration (1s)",
-        description: "Quick confirmations that shouldn't linger.",
-        code: `toast("Flash — gone in 1 s", { duration: 1000 });`,
+        title: "Flash Duration (1s)",
+        description:
+          "Quick confirmations that vanish rapidly to minimize UI disruption.",
+        code: `toast("Flash — gone in 1s", { duration: 1000 });`,
       },
       {
-        title: "Sticky (infinite)",
-        description: "Stays until manually dismissed. Use for critical info.",
+        title: "Sticky Notification",
+        description:
+          "Manual dismissal only. Essential for critical system alerts or must-read info.",
         code: `toast.info("Sticky — stays until dismissed", {
   duration: Infinity,
 });`,
       },
       {
-        title: "Extended duration (8s)",
-        description: "Longer display for complex messages.",
-        code: `toast("Extended 8 s toast", {
-  description: "Good for complex messages.",
+        title: "Extended Duration (8s)",
+        description:
+          "Extended display time for complex messages that require more reading time.",
+        code: `toast("Extended 8s toast", {
+  description: "Provides more time for complex messages.",
   duration: 8000,
 });`,
       },
@@ -98,8 +109,9 @@ export const PATTERN_CODES: Record<string, PatternCode> = {
     setup: `import { toast } from "sonner";`,
     steps: [
       {
-        title: "Promise toast",
-        description: "Automatically transitions through loading → success/error based on Promise resolution.",
+        title: "Promise Lifecycle",
+        description:
+          "The most powerful pattern — manages loading, success, and error states in one call.",
         code: `const uploadFile = async () => {
   // Your async operation
   return { name: "design-system.fig" };
@@ -112,8 +124,9 @@ toast.promise(uploadFile(), {
 });`,
       },
       {
-        title: "Promise with simple messages",
-        description: "Use plain strings when you don't need dynamic data.",
+        title: "Stateless Promise",
+        description:
+          "Use static strings when you don't need to reference returned data from the Promise.",
         code: `toast.promise(syncWorkspace(), {
   loading: "Syncing workspace…",
   success: "Sync complete — all changes saved.",
@@ -126,10 +139,11 @@ toast.promise(uploadFile(), {
     setup: `import { toast } from "sonner";`,
     steps: [
       {
-        title: "Undo action",
-        description: "Let users reverse destructive operations.",
+        title: "Undo Pattern",
+        description:
+          "A common UX pattern that allows users to reverse a destructive operation safely.",
         code: `toast("Message deleted", {
-  description: "Undo within 5 s.",
+  description: "Undo within 5s.",
   action: {
     label: "Undo",
     onClick: () => toast.success("Message restored!"),
@@ -137,8 +151,9 @@ toast.promise(uploadFile(), {
 });`,
       },
       {
-        title: "Retry action",
-        description: "Offer instant retry on transient failures.",
+        title: "Retry Action",
+        description:
+          "Offer an immediate way to re-trigger failed network or system requests.",
         code: `toast.error("Connection lost", {
   action: {
     label: "Retry",
@@ -147,12 +162,13 @@ toast.promise(uploadFile(), {
 });`,
       },
       {
-        title: "Action + Cancel",
-        description: "Two-button patterns for user choice.",
+        title: "Primary & Secondary Actions",
+        description:
+          "Support complex choices by providing two distinct action buttons.",
         code: `toast("New version available", {
   description: "v4.0 ships with 14 new components.",
   action: {
-    label: "Update now",
+    label: "Update Now",
     onClick: () => startUpdate(),
   },
   cancel: {
@@ -167,22 +183,24 @@ toast.promise(uploadFile(), {
     setup: `import { toast } from "sonner";`,
     steps: [
       {
-        title: "Cancel destructive action",
-        description: "Give users a safety net before irreversible operations.",
+        title: "Safe Deletion Pattern",
+        description:
+          "Provide a quick 'Keep' option for destructive flows to prevent accidents.",
         code: `toast("File scheduled for deletion", {
   cancel: {
-    label: "Keep file",
+    label: "Keep File",
     onClick: () => toast.info("Deletion cancelled."),
   },
 });`,
       },
       {
-        title: "Cancel with timer",
-        description: "Combine cancel with extended duration for countdowns.",
-        code: `toast.warning("Logging you out in 30 s…", {
+        title: "Timed Cancellation",
+        description:
+          "Combine a cancel action with a long duration for 'scheduled' system events.",
+        code: `toast.warning("Logging you out in 30s…", {
   duration: 30000,
   cancel: {
-    label: "Stay logged in",
+    label: "Stay Logged In",
     onClick: () => toast.success("Session extended."),
   },
 });`,
@@ -193,8 +211,9 @@ toast.promise(uploadFile(), {
     setup: `import { toast } from "sonner";\nimport { ShoppingCart } from "lucide-react";`,
     steps: [
       {
-        title: "Custom JSX action buttons",
-        description: "Pass full React elements for styled action/cancel buttons.",
+        title: "Custom JSX Actions",
+        description:
+          "Pass full React components as actions to match your specific Design System styles.",
         code: `toast("Item added to cart", {
   icon: <ShoppingCart className="size-4" />,
   action: (
@@ -212,7 +231,7 @@ toast.promise(uploadFile(), {
         text-xs text-neutral-400 rounded-md"
       onClick={() => keepShopping()}
     >
-      Keep shopping
+      Keep Shopping
     </button>
   ),
 });`,
@@ -223,13 +242,15 @@ toast.promise(uploadFile(), {
     setup: `import { toast } from "sonner";`,
     steps: [
       {
-        title: "Capture toast ID",
-        description: "Create a loading toast and store its ID for later updates.",
+        title: "Capture Toast Identity",
+        description:
+          "Manually trigger a loading state and capture its ID for precise control.",
         code: `const id = toast.loading("Processing your request…");`,
       },
       {
-        title: "Update to success",
-        description: "Replace the loading toast with a success message using the same ID.",
+        title: "Manual Success Resolution",
+        description:
+          "Replace the original loading toast with success using the captured ID.",
         code: `// After async operation completes
 toast.success("Report is ready to download.", { id });`,
       },
@@ -239,8 +260,9 @@ toast.success("Report is ready to download.", { id });`,
     setup: `import { toast } from "sonner";`,
     steps: [
       {
-        title: "Loading → Error pattern",
-        description: "Same ID-based approach, but resolving to an error state.",
+        title: "Manual Error Resolution",
+        description:
+          "Gracefully resolve a pending operation into an explicit error state.",
         code: `const id = toast.loading("Verifying payment method…");
 
 // When the operation fails
@@ -254,15 +276,17 @@ setTimeout(() => {
     setup: `import { toast } from "sonner";`,
     steps: [
       {
-        title: "Dismiss all toasts",
-        description: "Clear every active toast. Essential for cleanup on navigation.",
+        title: "Global Dismissal",
+        description:
+          "Wipe the entire notification stack. Use this on navigation or page transitions.",
         code: `// Dismiss all active toasts
 toast.dismiss();`,
       },
       {
-        title: "Dismiss specific toast",
-        description: "Dismiss a single toast by its ID.",
-        code: `const id = toast("Notification");
+        title: "Targeted Dismissal",
+        description:
+          "Remove a specific notification without affecting the rest of the stack.",
+        code: `const id = toast("Self-destructing message");
 
 // Later, dismiss just this one
 toast.dismiss(id);`,
@@ -273,13 +297,15 @@ toast.dismiss(id);`,
     setup: `import { toast } from "sonner";`,
     steps: [
       {
-        title: "Create initial loading toast",
-        description: "Start with a loading state and capture the ID.",
+        title: "Identity-Based Mutation",
+        description:
+          "Update the message string and metadata of a single toast multiple times.",
         code: `const id = toast.loading("Starting deployment…");`,
       },
       {
-        title: "Update through phases",
-        description: "Replace the message at each stage using the same ID.",
+        title: "Progressive Phase Mapping",
+        description:
+          "Cycle through distinct technical phases while maintaining the same UI slot.",
         code: `setTimeout(() => 
   toast.loading("Installing dependencies…", { id }), 1200);
 setTimeout(() => 
@@ -288,12 +314,13 @@ setTimeout(() =>
   toast.loading("Uploading to CDN…", { id }), 3600);`,
       },
       {
-        title: "Final success state",
-        description: "Resolve to success with a description.",
+        title: "Terminal Resolution",
+        description:
+          "Resolve the final phase into a permanent success or error toast.",
         code: `setTimeout(() =>
   toast.success("Deployed to production", {
     id,
-    description: "Live at your-domain.com",
+    description: "Live at your-app-v2.vercel.app",
     duration: 6000,
   }), 4800);`,
       },
@@ -303,15 +330,17 @@ setTimeout(() =>
     setup: `import { toast } from "sonner";\nimport { Bell, Star, Heart } from "lucide-react";`,
     steps: [
       {
-        title: "Use Lucide icons",
-        description: "Pass any React node as the icon prop.",
+        title: "Brand-Aligned Icons",
+        description:
+          "Inject any Lucide icon or custom SVG to match your product's aesthetics.",
         code: `toast("3 new notifications", {
   icon: <Bell className="size-4 text-purple-400" />,
 });`,
       },
       {
-        title: "Use emoji",
-        description: "Simple string emoji works as icons too.",
+        title: "Emoji Expression",
+        description:
+          "Use simple strings or emojis for high-readability, zero-weight icons.",
         code: `toast("Order shipped — arrives Friday", {
   icon: "📦",
 });`,
@@ -322,28 +351,31 @@ setTimeout(() =>
     setup: `import { toast } from "sonner";\nimport { User, Lock } from "lucide-react";`,
     steps: [
       {
-        title: "Login success",
-        description: "Welcome the user with contextual details.",
-        code: `toast.success("Welcome back, Pankaj 👋", {
-  description: "Logged in from Bengaluru, IN.",
+        title: "Auth Success Context",
+        description:
+          "Reassure users by showing contextual data like location or username.",
+        code: `toast.success("Welcome back!", {
+  description: "Logged in from San Francisco, CA.",
   icon: <User className="size-4" />,
 });`,
       },
       {
-        title: "2FA notification",
-        description: "Confirm security settings changes.",
+        title: "Two-Factor Confirmation",
+        description:
+          "Briefly confirm security setting changes after user interaction.",
         code: `toast("2FA enabled", {
   icon: <Lock className="size-4 text-green-400" />,
   description: "Your account is now more secure.",
 });`,
       },
       {
-        title: "Suspicious device alert",
-        description: "Actionable security notification.",
+        title: "Security Risk Alert",
+        description:
+          "Direct users to critical settings with prioritized action buttons.",
         code: `toast.info("New device detected", {
-  description: "MacBook Pro — Mumbai. Not you?",
+  description: "Unknown login — Mumbai, IN.",
   action: {
-    label: "Review",
+    label: "Review Settings",
     onClick: () => openSecuritySettings(),
   },
 });`,
@@ -354,21 +386,23 @@ setTimeout(() =>
     setup: `import { toast } from "sonner";\nimport { WifiOff, Save } from "lucide-react";`,
     steps: [
       {
-        title: "Offline detection",
-        description: "Sticky offline toast with retry action.",
-        code: `toast.error("You're offline", {
+        title: "Network Resilience",
+        description:
+          "Persistent notifications during disconnection with an 'Auto-Retry' intent.",
+        code: `toast.error("You are currently offline", {
   icon: <WifiOff className="size-4" />,
   duration: Infinity,
   action: {
-    label: "Try again",
+    label: "Reconnect",
     onClick: () => checkConnection(),
   },
 });`,
       },
       {
-        title: "Autosave confirmation",
-        description: "Brief confirmation that fades quickly.",
-        code: `toast("Draft saved automatically", {
+        title: "Passive Affirmation",
+        description:
+          "Brief, non-disruptive confirmation that background tasks are succeeding.",
+        code: `toast("Changes saved automatically", {
   icon: <Save className="size-4" />,
   duration: 2000,
 });`,
@@ -379,24 +413,26 @@ setTimeout(() =>
     setup: `import { toast } from "sonner";`,
     steps: [
       {
-        title: "Plan upgrade",
-        description: "Celebrate conversions with action to explore.",
-        code: `toast.success("Pro plan activated", {
-  description: "All premium features unlocked.",
+        title: "Conversion Celebration",
+        description:
+          "Mark successful transactions or upgrades with a high-visibility variant.",
+        code: `toast.success("Pro Plan activated", {
+  description: "All premium features are now live.",
   action: {
-    label: "Explore",
+    label: "View Perks",
     onClick: () => navigateToFeatures(),
   },
 });`,
       },
       {
-        title: "Flash sale with urgency",
-        description: "Time-limited promotions with CTA.",
-        code: `toast("Flash sale ends in 2 h", {
+        title: "Time-Sensitive CTA",
+        description:
+          "Create urgency and drive immediate action using emojis and specific codes.",
+        code: `toast("Flash sale ends in 2h", {
   icon: "⏰",
-  description: "40% off — use code LAUNCH40.",
+  description: "40% off — use code FLASH40.",
   action: {
-    label: "Shop now",
+    label: "Shop Now",
     onClick: () => openStore(),
   },
 });`,
@@ -407,24 +443,26 @@ setTimeout(() =>
     setup: `import { toast } from "sonner";\nimport { User, Share2 } from "lucide-react";`,
     steps: [
       {
-        title: "Presence notification",
-        description: "Show when collaborators start editing.",
-        code: `toast("Pankaj started editing", {
+        title: "Presence Awareness",
+        description:
+          "Surface team activity in real-time to prevent editing collisions.",
+        code: `toast("Collaborator joined session", {
   icon: <User className="size-4 text-blue-400" />,
-  description: "Design tokens — components.json",
+  description: "Now editing — index.css",
 });`,
       },
       {
-        title: "Share with copy action",
-        description: "Generate share link with clipboard action.",
+        title: "Clipboard Feedback",
+        description:
+          "Confirm abstract background actions like copying URLs to the clipboard.",
         code: `toast("Share link generated", {
-  description: "Anyone with the link can view.",
+  description: "Privacy set to: Public view.",
   icon: <Share2 className="size-4 text-violet-400" />,
   action: {
-    label: "Copy link",
+    label: "Copy Link",
     onClick: () => {
       navigator.clipboard.writeText(shareUrl);
-      toast("Copied!", { duration: 1500 });
+      toast("Copied to clipboard!", { duration: 1500 });
     },
   },
 });`,
@@ -435,18 +473,19 @@ setTimeout(() =>
     setup: `import { toast } from "sonner";`,
     steps: [
       {
-        title: "Auto-retry with backoff",
-        description: "Implement exponential retry with attempt tracking.",
+        title: "Exponential Backoff Pattern",
+        description:
+          "Implement a sophisticated retry loop with progressive attempt tracking on a single toast.",
         code: `let attempts = 0;
 
 const tryFetch = () => {
   attempts++;
   toast.promise(
-    fetchData(), // your async operation
+    fetchData(),
     {
       loading: \`Attempt \${attempts} of 3…\`,
-      success: "Data fetched after retries!",
-      error: (e) => \`\${e.message} — retrying…\`,
+      success: "Successfully connected!",
+      error: (e) => \`Attempt failed — retrying…\`,
     }
   );
   if (attempts < 3) {
@@ -462,21 +501,22 @@ tryFetch();`,
     setup: `import { toast } from "sonner";`,
     steps: [
       {
-        title: "Multi-step with single toast ID",
-        description: "Walk through validation, creation, setup, and confirmation — all on one toast.",
-        code: `const id = toast.loading("Validating form data…");
+        title: "Sequential Flow Management",
+        description:
+          "Map an entire user journey — from validation to delivery — onto a single toast Identity.",
+        code: `const id = toast.loading("Validating account details…");
 
 setTimeout(() => 
-  toast.loading("Creating your account…", { id }), 1600);
+  toast.loading("Creating your user profile…", { id }), 1600);
 
 setTimeout(() => 
-  toast.loading("Setting up workspace…", { id }), 3200);
+  toast.loading("Provisioning workspace…", { id }), 3200);
 
 setTimeout(() => 
   toast.loading("Sending verification email…", { id }), 4800);
 
 setTimeout(() =>
-  toast.success("Account created! Check inbox.", {
+  toast.success("Account ready! Welcome aboard.", {
     id,
     duration: 6000,
   }), 6400);`,
@@ -487,20 +527,21 @@ setTimeout(() =>
     setup: `import { toast } from "sonner";`,
     steps: [
       {
-        title: "Checkout pipeline",
-        description: "Cart → payment → merchant → confirmed. Four states, one toast.",
-        code: `const id = toast.loading("Validating cart…");
+        title: "The Pipeline Pattern",
+        description:
+          "Show real-time progress of a payment pipeline using state-morphing toasts.",
+        code: `const id = toast.loading("Confirming order details…");
 
 setTimeout(() => 
   toast.loading("Processing payment…", { id }), 1400);
 
 setTimeout(() => 
-  toast.loading("Confirming with merchant…", { id }), 2800);
+  toast.loading("Securing merchant approval…", { id }), 2800);
 
 setTimeout(() =>
   toast.success("Order confirmed", {
     id,
-    description: "Confirmation sent to email.",
+    description: "Digital receipt sent to email.",
     duration: 6000,
   }), 4200);`,
       },
@@ -510,28 +551,30 @@ setTimeout(() =>
     setup: `import { toast } from "sonner";\nimport { Settings } from "lucide-react";`,
     steps: [
       {
-        title: "Settings autosave toast",
-        description: "The highest-frequency toast in settings-heavy products.",
+        title: "The Save Pattern",
+        description:
+          "High-frequency, low-friction feedback designed for autosave-heavy interfaces.",
         code: `toast.success("Preferences saved", {
   icon: <Settings className="size-4" />,
-  description: "Changes applied across all devices.",
+  description: "Changes applied across all sessions.",
 });`,
       },
     ],
   },
   "21": {
-    setup: `import { toast } from "sonner";\nimport { Zap, Sparkles } from "lucide-react";`,
+    setup: `import { toast } from "sonner";\nimport { Zap } from "lucide-react";`,
     steps: [
       {
-        title: "Shortcut discovery toast",
-        description: "Surface keyboard shortcuts at the right moment.",
-        code: `toast("Pro tip", {
-  description: "Press ⌘K to open the command palette.",
-  icon: <Zap className="size-4 text-purple-400" />,
-  duration: 6000,
+        title: "Contextual Education",
+        description:
+          "Turn users into power users by surfacing keyboard hints at relevant moments.",
+        code: `toast("Pro Tip", {
+  description: "Hit ⌘K to open the Omni Search.",
+  icon: <Zap className="size-4 text-yellow-400" />,
+  duration: 8000,
   action: {
-    label: "Got it",
-    onClick: () => toast.success("Shortcut noted!"),
+    label: "Try It Now",
+    onClick: () => openOmniSearch(),
   },
 });`,
       },
@@ -541,31 +584,26 @@ setTimeout(() =>
     setup: `import { toast } from "sonner";\nimport { Gauge } from "lucide-react";`,
     steps: [
       {
-        title: "Warning at threshold",
-        description: "Warn users before they hit API limits.",
-        code: `toast.warning("API rate limit — 80% used", {
-  description: "8,000 of 10,000 requests consumed.",
+        title: "System Threshold Alerts",
+        description:
+          "Warn users before they hit technical boundaries or API rate limits.",
+        code: `toast.warning("API Quota — 80% used", {
+  description: "16k operations remaining in cycle.",
   icon: <Gauge className="size-4 text-amber-400" />,
   action: {
-    label: "Upgrade plan",
+    label: "Upgrade Plan",
     onClick: () => openBilling(),
   },
 });`,
       },
       {
-        title: "Limit exceeded",
-        description: "Block with extended duration when exceeded.",
-        code: `toast.error("Rate limit exceeded", {
-  description: "Resets in 43 s. Requests queued.",
-  icon: <Gauge className="size-4 text-red-400" />,
+        title: "Hard Limit Response",
+        description:
+          "Block actions effectively when limits are hit, providing a 'refill' countdown.",
+        code: `toast.error("Rate limit reached", {
+  description: "Limit resets in 14s. Requests queued.",
+  icon: <Gauge className="size-4 text-red-500" />,
   duration: 8000,
-});`,
-      },
-      {
-        title: "Quota refilled",
-        description: "Celebrate when capacity is restored.",
-        code: `toast.success("Quota refilled", {
-  description: "10,000 fresh requests available.",
 });`,
       },
     ],
@@ -574,8 +612,9 @@ setTimeout(() =>
     setup: `import { toast } from "sonner";\nimport { FileDown } from "lucide-react";`,
     steps: [
       {
-        title: "Background job with polling",
-        description: "Fire-and-forget with progressive status updates and a final CTA.",
+        title: "Fire-and-Forget Job Pattern",
+        description:
+          "Maintain UI focus while managing a long-running background export with a final CTA.",
         code: `const id = toast("Export started", {
   description: "We'll notify you when ready.",
   icon: <FileDown className="size-4 text-blue-400" />,
@@ -583,51 +622,53 @@ setTimeout(() =>
 });
 
 setTimeout(() => 
-  toast.loading("Processing 14,203 rows…", { id }), 1800);
+  toast.loading("Processing dataset rows…", { id }), 1800);
 setTimeout(() => 
-  toast.loading("Compressing output file…", { id }), 5000);
+  toast.loading("Compressing CSV file…", { id }), 5000);
 
 setTimeout(() =>
-  toast.success("Export ready — 14,203 rows", {
+  toast.success("Export ready for download", {
     id,
-    description: "report-2025-q1.csv · 2.4 MB",
+    description: "report-fy25.csv · 2.4MB",
     duration: Infinity,
     action: {
       label: "Download",
-      onClick: () => downloadFile(),
+      onClick: () => handleDownload(),
     },
   }), 6400);`,
       },
     ],
   },
   "24": {
-    setup: `import { toast } from "sonner";\nimport { UserCheck, Plug, Trophy } from "lucide-react";`,
+    setup: `import { toast } from "sonner";\nimport { UserCheck, Plug } from "lucide-react";`,
     steps: [
       {
-        title: "Profile completion nudge",
-        description: "Prompt users to complete their setup with action + dismiss.",
+        title: "Progressive Onboarding",
+        description:
+          "Nudge users toward profile completion with low-friction action buttons.",
         code: `toast("Complete your profile", {
-  description: "Add a photo to get 3× more visibility.",
+  description: "Add a photo to get 5x more reach.",
   icon: <UserCheck className="size-4 text-violet-400" />,
   duration: 8000,
   action: {
-    label: "Complete now",
-    onClick: () => openProfileEditor(),
+    label: "Add Photo",
+    onClick: () => openPicker(),
   },
   cancel: {
-    label: "Later",
+    label: "Dismiss",
     onClick: () => snooze(),
   },
 });`,
       },
       {
-        title: "Integration prompt",
-        description: "Guide users toward key integrations.",
-        code: `toast.info("Connect your first integration", {
-  description: "Link GitHub for automated deploys.",
-  icon: <Plug className="size-4 text-blue-400" />,
+        title: "Ecosystem Growth Nudges",
+        description:
+          "Guide users toward key integrations at the most relevant moment.",
+        code: `toast.info("Unleash the power of GitHub", {
+  description: "Link accounts for one-click deploys.",
+  icon: <Plug className="size-4 text-blue-500" />,
   action: {
-    label: "Connect",
+    label: "Connect Now",
     onClick: () => connectGitHub(),
   },
 });`,

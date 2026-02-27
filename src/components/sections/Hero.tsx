@@ -20,7 +20,12 @@ export function Hero() {
         >
           <motion.div
             animate={{ rotate: [0, 15, -15, 0] }}
-            transition={{ duration: 1.5, delay: 1.5, repeat: Infinity, repeatDelay: 4 }}
+            transition={{
+              duration: 1.5,
+              delay: 1.5,
+              repeat: Infinity,
+              repeatDelay: 4,
+            }}
           >
             <Zap className="size-3" />
           </motion.div>
@@ -28,10 +33,9 @@ export function Hero() {
         </motion.div>
 
         <h1 className="h1">
-          <RevealWords text="Every toast" delay={0.25} />
+          <RevealWords text="Every toast pattern" delay={0.25} />
           <br />
-          <RevealWords text="pattern you'll" delay={0.4} />
-          <br />
+          <RevealWords text="you'll" delay={0.4} />{" "}
           <motion.em
             initial={{ opacity: 0, y: 16, filter: "blur(8px)" }}
             animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
@@ -51,11 +55,9 @@ export function Hero() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.55, delay: 0.95, ease: [0.22, 1, 0.36, 1] }}
         >
-          The complete reference for <strong>Sonner</strong> — the most
-          precise React notification library. 24 battle-tested patterns
-          spanning async pipelines, multi-step flows, real-world auth,
-          e-commerce, and collaborative UX.{" "}
-          <strong>Click any card to fire it live.</strong>
+          A definitive collection of <strong>24 battle-tested patterns</strong>{" "}
+          for Sonner. From async pipelines to interactive auth flows —{" "}
+          <strong>zero guesswork, pure implementation.</strong>
         </motion.p>
 
         <motion.div
@@ -68,9 +70,7 @@ export function Hero() {
             <Sparkles className="size-4" />
             Fire first toast
           </MagneticButton>
-          <span className="hero-note">
-            scroll to explore all 24 patterns →
-          </span>
+          <span className="hero-note">Scroll to explore all 24 patterns →</span>
         </motion.div>
       </div>
 
