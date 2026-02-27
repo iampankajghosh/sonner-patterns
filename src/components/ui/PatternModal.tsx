@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from "motion/react";
 import { X, Copy, Check, BookOpen, ChevronRight } from "lucide-react";
 import type { Group } from "../../lib/groups";
 import { PATTERN_CODES } from "../../lib/pattern-codes";
+import { usePostHog } from "@posthog/react";
 
 interface PatternModalProps {
   group: Group | null;
@@ -15,6 +16,20 @@ export function PatternModal({ group, onClose }: PatternModalProps) {
   const overlayRef = useRef<HTMLDivElement>(null);
   const panelRef = useRef<HTMLDivElement>(null);
   const [showMask, setShowMask] = useState(true);
+  const posthog = usePostHog();
+
+  const handleClose = useCallback(
+    (method: "button" | "escape" | "backdrop") => {
+      posthog.capture("pattern_modal_closed", {
+        pattern_id: group?.id,
+        pattern_label: group?.label,
+        pattern_tag: group?.tag,
+        close_method: method,
+      });
+      onClose();
+    },
+    [group, onClose, posthog],
+  );
 
   useEffect(() => {
     if (group) {
@@ -27,17 +42,17 @@ export function PatternModal({ group, onClose }: PatternModalProps) {
 
   useEffect(() => {
     const handleKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") onClose();
+      if (e.key === "Escape") handleClose("escape");
     };
     window.addEventListener("keydown", handleKey);
     return () => window.removeEventListener("keydown", handleKey);
-  }, [onClose]);
+  }, [handleClose]);
 
   const handleBackdropClick = useCallback(
     (e: React.MouseEvent) => {
-      if (e.target === overlayRef.current) onClose();
+      if (e.target === overlayRef.current) handleClose("backdrop");
     },
-    [onClose],
+    [handleClose],
   );
 
   const patternData = group ? PATTERN_CODES[group.id] : null;
@@ -89,7 +104,7 @@ export function PatternModal({ group, onClose }: PatternModalProps) {
               </div>
               <button
                 className="modal-close"
-                onClick={onClose}
+                onClick={() => handleClose("button")}
                 aria-label="Close modal"
               >
                 <X className="size-4" />
@@ -104,7 +119,12 @@ export function PatternModal({ group, onClose }: PatternModalProps) {
                   <BookOpen className="size-3" />
                   Setup
                 </div>
-                <CodeBlock code={patternData.setup} />
+                <CodeBlock
+                  code={patternData.setup}
+                  patternId={group.id}
+                  patternLabel={group.label}
+                  codeContext="setup"
+                />
               </div>
             )}
 
@@ -128,7 +148,13 @@ export function PatternModal({ group, onClose }: PatternModalProps) {
                     <h3 className="modal-step-title">{step.title}</h3>
                   </div>
                   <p className="modal-step-desc">{step.description}</p>
-                  <CodeBlock code={step.code} />
+                  <CodeBlock
+                    code={step.code}
+                    patternId={group.id}
+                    patternLabel={group.label}
+                    codeContext={`step_${i + 1}`}
+                    stepTitle={step.title}
+                  />
                 </div>
               ))}
             </div>
@@ -151,8 +177,21 @@ export function PatternModal({ group, onClose }: PatternModalProps) {
   );
 }
 
-function CodeBlock({ code }: { code: string }) {
+function CodeBlock({
+  code,
+  patternId,
+  patternLabel,
+  codeContext,
+  stepTitle,
+}: {
+  code: string;
+  patternId: string;
+  patternLabel: string;
+  codeContext: string;
+  stepTitle?: string;
+}) {
   const [copied, setCopied] = useState(false);
+  const posthog = usePostHog();
 
   const handleCopy = async () => {
     try {
@@ -169,6 +208,12 @@ function CodeBlock({ code }: { code: string }) {
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     }
+    posthog.capture("pattern_code_copied", {
+      pattern_id: patternId,
+      pattern_label: patternLabel,
+      code_context: codeContext,
+      step_title: stepTitle,
+    });
   };
 
   const highlightedCode = highlight(code);

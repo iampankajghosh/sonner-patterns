@@ -11,6 +11,7 @@ import {
 import { ChevronRight } from "lucide-react";
 import { MagneticButton } from "./MagneticButton";
 import type { Group } from "../../lib/groups";
+import { usePostHog } from "@posthog/react";
 
 interface DemoCardProps {
   group: Group;
@@ -22,6 +23,7 @@ export function DemoCard({ group, index, onOpen }: DemoCardProps) {
   const ref = useRef<HTMLDivElement>(null);
   const inView = useInView(ref, { once: true, margin: "-80px" });
   const Icon = group.icon;
+  const posthog = usePostHog();
 
   const cardX = useMotionValue(0);
   const cardY = useMotionValue(0);
@@ -71,6 +73,11 @@ export function DemoCard({ group, index, onOpen }: DemoCardProps) {
         const target = e.target as HTMLElement;
         if (!target.closest(".magnetic-button")) {
           onOpen();
+          posthog.capture("pattern_card_opened", {
+            pattern_id: group.id,
+            pattern_label: group.label,
+            pattern_tag: group.tag,
+          });
         }
       }}
     >
@@ -112,7 +119,19 @@ export function DemoCard({ group, index, onOpen }: DemoCardProps) {
 
       <div className="card-actions">
         {group.actions.map((a) => (
-          <MagneticButton key={a.label} onClick={a.fn} variant="ghost">
+          <MagneticButton
+            key={a.label}
+            onClick={() => {
+              a.fn();
+              posthog.capture("pattern_demo_triggered", {
+                pattern_id: group.id,
+                pattern_label: group.label,
+                pattern_tag: group.tag,
+                action_label: a.label,
+              });
+            }}
+            variant="ghost"
+          >
             <ChevronRight className="-mt-px mr-0.5 inline-block size-3 opacity-50" />
             {a.label}
           </MagneticButton>

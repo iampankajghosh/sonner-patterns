@@ -3,12 +3,15 @@
 import { motion } from "motion/react";
 import { Star } from "lucide-react";
 import { Logo } from "../ui/Logo";
+import { usePostHog } from "@posthog/react";
 
 interface HeaderProps {
   navScrolled: boolean;
 }
 
 export function Header({ navScrolled }: HeaderProps) {
+  const posthog = usePostHog();
+
   return (
     <motion.header
       className={`nav-header ${navScrolled ? "scrolled" : ""}`}
@@ -27,6 +30,12 @@ export function Header({ navScrolled }: HeaderProps) {
             rel="noopener noreferrer"
             whileTap={{ y: 0 }}
             aria-label="View Sonner Documentation"
+            onClick={() =>
+              posthog.capture("docs_link_clicked", {
+                destination: "https://sonner.emilkowal.ski/",
+                link_label: "Docs",
+              })
+            }
           >
             Docs ↗
           </motion.a>
@@ -37,6 +46,13 @@ export function Header({ navScrolled }: HeaderProps) {
             rel="noopener noreferrer"
             whileTap={{ y: 0 }}
             aria-label="Star sonner-patterns on GitHub"
+            onClick={() =>
+              posthog.capture("github_star_clicked", {
+                destination:
+                  "https://github.com/iampankajghosh/sonner-patterns",
+                link_label: "Star",
+              })
+            }
           >
             <Star className="size-3" />
             <span className="nav-pill-text">Star</span>

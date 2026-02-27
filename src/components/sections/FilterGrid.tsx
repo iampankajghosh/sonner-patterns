@@ -6,6 +6,7 @@ import { DemoCard } from "../ui/DemoCard";
 import { CopyButton } from "../ui/CopyButton";
 import { GROUPS } from "../../lib/groups";
 import type { Group } from "../../lib/groups";
+import { usePostHog } from "@posthog/react";
 
 interface FilterGridProps {
   filter: string;
@@ -19,6 +20,7 @@ export function FilterGrid({
   onOpenPattern,
 }: FilterGridProps) {
   const [isFirstRender, setIsFirstRender] = useState(true);
+  const posthog = usePostHog();
 
   useEffect(() => {
     const timer = setTimeout(() => setIsFirstRender(false), 1000);
@@ -82,7 +84,16 @@ export function FilterGrid({
           <motion.button
             key={t}
             className={`filter-btn ${filter === t ? "on" : ""}`}
-            onClick={() => setFilter(t)}
+            onClick={() => {
+              setFilter(t);
+              posthog.capture("pattern_filter_applied", {
+                filter_tag: t,
+                result_count:
+                  t === "all"
+                    ? GROUPS.length
+                    : GROUPS.filter((g) => g.tag === t).length,
+              });
+            }}
             whileTap={{ y: 0 }}
             transition={{ type: "spring", stiffness: 400, damping: 20 }}
             layout

@@ -6,8 +6,11 @@ import { RevealWords } from "../ui/RevealWords";
 import { ToastPreview } from "../ui/ToastPreview";
 import { MagneticButton } from "../ui/MagneticButton";
 import { basicVariants } from "../../lib/toast-demos";
+import { usePostHog } from "@posthog/react";
 
 export function Hero() {
+  const posthog = usePostHog();
+
   return (
     <section className="hero">
       <div className="hero-left">
@@ -65,7 +68,17 @@ export function Hero() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.75, ease: [0.22, 1, 0.36, 1] }}
         >
-          <MagneticButton variant="primary" onClick={basicVariants}>
+          <MagneticButton
+            variant="primary"
+            onClick={() => {
+              basicVariants();
+              posthog.capture("hero_demo_triggered", {
+                pattern_id: "01",
+                pattern_label: "Core Variants",
+                trigger_location: "hero",
+              });
+            }}
+          >
             <Sparkles className="size-4" />
             Try the first toast
           </MagneticButton>
