@@ -7,11 +7,14 @@ import { Header } from "./components/sections/Header";
 import { Hero } from "./components/sections/Hero";
 import { FilterGrid } from "./components/sections/FilterGrid";
 import { Footer } from "./components/sections/Footer";
+import { PatternModal } from "./components/ui/PatternModal";
+import type { Group } from "./lib/groups";
 
 export default function ToastPlayground() {
   const [mounted, setMounted] = useState(false);
   const [filter, setFilter] = useState("all");
   const [navScrolled, setNavScrolled] = useState(false);
+  const [selectedPattern, setSelectedPattern] = useState<Group | null>(null);
 
   useEffect(() => setMounted(true), []);
 
@@ -35,12 +38,21 @@ export default function ToastPlayground() {
         <div className="wrap">
           <main>
             <Hero />
-            <FilterGrid filter={filter} setFilter={setFilter} />
+            <FilterGrid 
+              filter={filter} 
+              setFilter={setFilter} 
+              onOpenPattern={setSelectedPattern} 
+            />
           </main>
 
           <Footer />
         </div>
       </div>
+
+      <PatternModal 
+        group={selectedPattern} 
+        onClose={() => setSelectedPattern(null)} 
+      />
     </>
   );
 }

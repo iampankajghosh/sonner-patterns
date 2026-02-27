@@ -4,13 +4,15 @@ import { motion, AnimatePresence } from "motion/react";
 import { DemoCard } from "../ui/DemoCard";
 import { CopyButton } from "../ui/CopyButton";
 import { GROUPS } from "../../lib/groups";
+import type { Group } from "../../lib/groups";
 
 interface FilterGridProps {
   filter: string;
   setFilter: (filter: string) => void;
+  onOpenPattern: (group: Group) => void;
 }
 
-export function FilterGrid({ filter, setFilter }: FilterGridProps) {
+export function FilterGrid({ filter, setFilter, onOpenPattern }: FilterGridProps) {
   const tags = ["all", ...Array.from(new Set(GROUPS.map((g) => g.tag)))];
   const filtered =
     filter === "all" ? [...GROUPS] : GROUPS.filter((g) => g.tag === filter);
@@ -105,7 +107,12 @@ export function FilterGrid({ filter, setFilter }: FilterGridProps) {
           transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
         >
           {filtered.map((g, i) => (
-            <DemoCard key={g.id} group={g} index={i} />
+            <DemoCard 
+              key={g.id} 
+              group={g} 
+              index={i} 
+              onOpen={() => onOpenPattern(g)} 
+            />
           ))}
         </motion.div>
       </AnimatePresence>

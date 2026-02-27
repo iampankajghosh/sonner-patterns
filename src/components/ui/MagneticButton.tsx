@@ -8,12 +8,14 @@ interface MagneticButtonProps {
   children: React.ReactNode;
   onClick: () => void;
   variant?: "ghost" | "primary";
+  className?: string;
 }
 
 export function MagneticButton({
   children,
   onClick,
   variant = "ghost",
+  className = "",
 }: MagneticButtonProps) {
   const [fired, setFired] = useState(false);
   const [ripple, setRipple] = useState<{ x: number; y: number } | null>(null);
@@ -43,8 +45,8 @@ export function MagneticButton({
       transition={{ type: "spring", stiffness: 500, damping: 28 }}
       className={
         variant === "primary"
-          ? "btn-primary"
-          : `btn-ghost ${fired ? "btn-fired" : ""}`
+          ? `btn-primary ${className}`
+          : `btn-ghost ${fired ? "btn-fired" : ""} ${className}`
       }
       style={{ position: "relative", overflow: "hidden" }}
     >
