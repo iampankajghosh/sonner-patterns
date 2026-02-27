@@ -71,7 +71,6 @@ export function PatternModal({ group, onClose }: PatternModalProps) {
         >
           <motion.div
             ref={panelRef}
-            layoutId={`modal-${group.id}`}
             className="modal-panel"
             transition={{
               duration: 0.35,

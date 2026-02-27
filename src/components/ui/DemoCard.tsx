@@ -51,8 +51,6 @@ export function DemoCard({ group, index, onOpen }: DemoCardProps) {
   return (
     <motion.div
       ref={ref}
-      layoutId={`modal-${group.id}`}
-      layout
       className="demo-card"
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}

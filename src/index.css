@@ -1581,9 +1581,12 @@ body::after {
 
   .footer-l {
     font-size: 10px;
+    text-align: center;
   }
   .footer-r {
     font-size: 10px;
+    width: 100%;
+    justify-content: center;
   }
 }
 
