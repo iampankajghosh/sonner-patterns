@@ -289,7 +289,6 @@ body::after {
   gap: 64px;
   align-items: flex-start;
   max-width: 100%;
-  /* min-height: 680px; */
 }
 
 .eyebrow {

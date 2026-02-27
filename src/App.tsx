@@ -23,7 +23,6 @@ export default function ToastPlayground() {
     window.scrollTo(0, 0);
     setMounted(true);
 
-    // Safety timeout to catch any late browser-restored scrolls
     const timer = setTimeout(() => window.scrollTo(0, 0), 0);
     return () => clearTimeout(timer);
   }, []);
