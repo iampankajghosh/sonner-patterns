@@ -16,9 +16,18 @@ export default function ToastPlayground() {
   const [navScrolled, setNavScrolled] = useState(false);
   const [selectedPattern, setSelectedPattern] = useState<Group | null>(null);
 
-  useEffect(() => setMounted(true), []);
+  useEffect(() => {
+    if ("scrollRestoration" in window.history) {
+      window.history.scrollRestoration = "manual";
+    }
+    window.scrollTo(0, 0);
+    setMounted(true);
 
-  // Nav scroll detection
+    // Safety timeout to catch any late browser-restored scrolls
+    const timer = setTimeout(() => window.scrollTo(0, 0), 0);
+    return () => clearTimeout(timer);
+  }, []);
+
   useEffect(() => {
     const handler = () => setNavScrolled(window.scrollY > 40);
     window.addEventListener("scroll", handler, { passive: true });
@@ -38,10 +47,10 @@ export default function ToastPlayground() {
         <div className="wrap">
           <main>
             <Hero />
-            <FilterGrid 
-              filter={filter} 
-              setFilter={setFilter} 
-              onOpenPattern={setSelectedPattern} 
+            <FilterGrid
+              filter={filter}
+              setFilter={setFilter}
+              onOpenPattern={setSelectedPattern}
             />
           </main>
 
@@ -49,9 +58,9 @@ export default function ToastPlayground() {
         </div>
       </div>
 
-      <PatternModal 
-        group={selectedPattern} 
-        onClose={() => setSelectedPattern(null)} 
+      <PatternModal
+        group={selectedPattern}
+        onClose={() => setSelectedPattern(null)}
       />
     </>
   );

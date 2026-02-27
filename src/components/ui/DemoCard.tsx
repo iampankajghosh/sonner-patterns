@@ -8,7 +8,7 @@ import {
   useTransform,
   useSpring,
 } from "motion/react";
-import { ChevronRight, BookOpen } from "lucide-react";
+import { ChevronRight } from "lucide-react";
 import { MagneticButton } from "./MagneticButton";
 import type { Group } from "../../lib/groups";
 
@@ -23,7 +23,6 @@ export function DemoCard({ group, index, onOpen }: DemoCardProps) {
   const inView = useInView(ref, { once: true, margin: "-80px" });
   const Icon = group.icon;
 
-  // Mouse tilt
   const cardX = useMotionValue(0);
   const cardY = useMotionValue(0);
   const rotateX = useTransform(cardY, [-0.5, 0.5], [3, -3]);
@@ -46,6 +45,8 @@ export function DemoCard({ group, index, onOpen }: DemoCardProps) {
   return (
     <motion.div
       ref={ref}
+      layoutId={`modal-${group.id}`}
+      layout
       className="demo-card"
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
@@ -62,13 +63,25 @@ export function DemoCard({ group, index, onOpen }: DemoCardProps) {
         transformStyle: "preserve-3d",
         perspective: 800,
       }}
+      onClick={(e) => {
+        const target = e.target as HTMLElement;
+        if (!target.closest(".magnetic-button")) {
+          onOpen();
+        }
+      }}
     >
+      <motion.div
+        className="card-spotlight"
+        style={{
+          background: useTransform(
+            [cardX, cardY],
+            ([x, y]) =>
+              `radial-gradient(400px circle at ${(Number(x) + 0.5) * 100}% ${(Number(y) + 0.5) * 100}%, rgba(200, 241, 53, 0.08), transparent)`,
+          ),
+        }}
+      />
       <div className="card-top">
-        <div
-          className="card-top-left"
-          onClick={onOpen}
-          style={{ cursor: "pointer" }}
-        >
+        <div className="card-top-left">
           <motion.div
             className="card-icon-wrap"
             style={{ "--tag-c": group.tagColor } as React.CSSProperties}
@@ -81,14 +94,6 @@ export function DemoCard({ group, index, onOpen }: DemoCardProps) {
         </div>
 
         <div className="card-top-right">
-          <button
-            onClick={onOpen}
-            className="btn-impl-mini"
-            title="View Implementation"
-          >
-            <BookOpen className="size-3.5" />
-          </button>
-
           <motion.span
             className="card-tag"
             style={{
@@ -102,13 +107,7 @@ export function DemoCard({ group, index, onOpen }: DemoCardProps) {
         </div>
       </div>
 
-      <motion.h3
-        className="card-title"
-        onClick={onOpen}
-        whileHover={{ color: "var(--accent)" }}
-      >
-        {group.label}
-      </motion.h3>
+      <h3 className="card-title">{group.label}</h3>
       <p className="card-desc">{group.desc}</p>
 
       <div className="card-actions">

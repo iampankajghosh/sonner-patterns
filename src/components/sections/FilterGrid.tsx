@@ -1,5 +1,6 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { DemoCard } from "../ui/DemoCard";
 import { CopyButton } from "../ui/CopyButton";
@@ -12,20 +13,29 @@ interface FilterGridProps {
   onOpenPattern: (group: Group) => void;
 }
 
-export function FilterGrid({ filter, setFilter, onOpenPattern }: FilterGridProps) {
+export function FilterGrid({
+  filter,
+  setFilter,
+  onOpenPattern,
+}: FilterGridProps) {
+  const [isFirstRender, setIsFirstRender] = useState(true);
+
+  useEffect(() => {
+    const timer = setTimeout(() => setIsFirstRender(false), 1500);
+    return () => clearTimeout(timer);
+  }, []);
+
   const tags = ["all", ...Array.from(new Set(GROUPS.map((g) => g.tag)))];
   const filtered =
     filter === "all" ? [...GROUPS] : GROUPS.filter((g) => g.tag === filter);
 
   return (
     <>
-      {/* Install strip */}
       <motion.div
         className="install"
-        initial={{ opacity: 0, y: 20 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true }}
-        transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, delay: 0.9, ease: [0.22, 1, 0.36, 1] }}
       >
         <span className="install-lbl">install</span>
         <code className="install-cmd">
@@ -37,35 +47,28 @@ export function FilterGrid({ filter, setFilter, onOpenPattern }: FilterGridProps
         </div>
       </motion.div>
 
-      {/* Section head */}
       <motion.div
         className="sec-head"
         initial={{ opacity: 0, y: 20 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true }}
-        transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, delay: 1.05, ease: [0.22, 1, 0.36, 1] }}
       >
         <motion.div
           className="sec-tag"
           initial={{ opacity: 0, x: -10 }}
-          whileInView={{ opacity: 1, x: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.4, delay: 0.1 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.4, delay: 1.15 }}
         >
-          {"// interactive playground"}
+          {"interactive playground"}
         </motion.div>
-        <h2 className="sec-h2">
-          Click to fire. <em>Watch and learn.</em>
-        </h2>
+        <h2 className="sec-h2">Click any pattern to see it in action</h2>
       </motion.div>
 
-      {/* Filters */}
       <motion.div
         className="filters"
         initial={{ opacity: 0, y: 12 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true }}
-        transition={{ duration: 0.45 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.45, delay: 1.2 }}
       >
         <span className="filter-lbl">filter:</span>
         {tags.map((t) => (
@@ -96,7 +99,6 @@ export function FilterGrid({ filter, setFilter, onOpenPattern }: FilterGridProps
         ))}
       </motion.div>
 
-      {/* Grid */}
       <AnimatePresence mode="wait">
         <motion.div
           key={filter}
@@ -104,14 +106,18 @@ export function FilterGrid({ filter, setFilter, onOpenPattern }: FilterGridProps
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: -8 }}
-          transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
+          transition={{
+            duration: 0.3,
+            delay: isFirstRender ? 1.3 : 0,
+            ease: [0.22, 1, 0.36, 1],
+          }}
         >
           {filtered.map((g, i) => (
-            <DemoCard 
-              key={g.id} 
-              group={g} 
-              index={i} 
-              onOpen={() => onOpenPattern(g)} 
+            <DemoCard
+              key={g.id}
+              group={g}
+              index={i}
+              onOpen={() => onOpenPattern(g)}
             />
           ))}
         </motion.div>

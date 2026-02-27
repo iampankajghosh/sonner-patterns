@@ -8,9 +8,10 @@ interface RevealWordsProps {
 }
 
 export function RevealWords({ text, delay = 0 }: RevealWordsProps) {
+  const words = text.split(" ");
   return (
     <>
-      {text.split(" ").map((w, i) => (
+      {words.map((w, i) => (
         <motion.span
           key={i}
           initial={{ opacity: 0, y: 14, filter: "blur(8px)" }}
@@ -20,7 +21,10 @@ export function RevealWords({ text, delay = 0 }: RevealWordsProps) {
             delay: delay + i * 0.08,
             ease: [0.22, 1, 0.36, 1],
           }}
-          style={{ display: "inline-block", marginRight: "0.28em" }}
+          style={{
+            display: "inline-block",
+            marginRight: i === words.length - 1 ? 0 : "0.28em",
+          }}
         >
           {w}
         </motion.span>

@@ -23,11 +23,11 @@ export function MagneticButton({
 
   const handleClick = useCallback(
     (e: React.MouseEvent<HTMLButtonElement>) => {
+      e.stopPropagation();
       setFired(true);
       onClick();
       setTimeout(() => setFired(false), 700);
 
-      // Ripple effect
       if (buttonRef.current) {
         const rect = buttonRef.current.getBoundingClientRect();
         setRipple({ x: e.clientX - rect.left, y: e.clientY - rect.top });
@@ -44,9 +44,10 @@ export function MagneticButton({
       whileTap={{ y: 0 }}
       transition={{ type: "spring", stiffness: 500, damping: 28 }}
       className={
-        variant === "primary"
+        (variant === "primary"
           ? `btn-primary ${className}`
-          : `btn-ghost ${fired ? "btn-fired" : ""} ${className}`
+          : `btn-ghost ${fired ? "btn-fired" : ""} ${className}`) +
+        " magnetic-button"
       }
       style={{ position: "relative", overflow: "hidden" }}
     >

@@ -10,7 +10,6 @@ import { basicVariants } from "../../lib/toast-demos";
 export function Hero() {
   return (
     <section className="hero">
-      {/* Left col */}
       <div className="hero-left">
         <motion.div
           className="eyebrow"
@@ -29,13 +28,13 @@ export function Hero() {
           >
             <Zap className="size-3" />
           </motion.div>
-          24 patterns · zero guesswork · ship faster
+          24 crafted patterns to help you build and ship faster
         </motion.div>
 
         <h1 className="h1">
           <RevealWords text="Every toast pattern" delay={0.25} />
           <br />
-          <RevealWords text="you'll" delay={0.4} />{" "}
+          <RevealWords text="you will" delay={0.4} />{" "}
           <motion.em
             initial={{ opacity: 0, y: 16, filter: "blur(8px)" }}
             animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
@@ -53,28 +52,27 @@ export function Hero() {
           className="hero-body"
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.55, delay: 0.95, ease: [0.22, 1, 0.36, 1] }}
+          transition={{ duration: 0.55, delay: 0.85, ease: [0.22, 1, 0.36, 1] }}
         >
-          A definitive collection of <strong>24 battle-tested patterns</strong>{" "}
-          for Sonner. From async pipelines to interactive auth flows —{" "}
-          <strong>zero guesswork, pure implementation.</strong>
+          A curated collection of <strong>24 essential patterns</strong> for
+          Sonner. I built this to help you handle everything from simple alerts
+          to complex auth flows without the headache.
         </motion.p>
 
         <motion.div
           className="hero-row"
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 1.1, ease: [0.22, 1, 0.36, 1] }}
+          transition={{ duration: 0.5, delay: 1.0, ease: [0.22, 1, 0.36, 1] }}
         >
           <MagneticButton variant="primary" onClick={basicVariants}>
             <Sparkles className="size-4" />
-            Fire first toast
+            Try the first toast
           </MagneticButton>
-          <span className="hero-note">Scroll to explore all 24 patterns →</span>
+          <span className="hero-note">Scroll down to see all the patterns</span>
         </motion.div>
       </div>
 
-      {/* Right col — live toast stack */}
       <motion.div
         className="hero-right"
         initial={{ opacity: 0, x: 40 }}

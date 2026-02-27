@@ -1,8 +1,6 @@
-/* ── Fonts ─────────────────────────────────────────────────────────────── */
 @import url("https://fonts.googleapis.com/css2?family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300;1,400;1,500&family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Instrument+Serif:ital@0;1&display=swap");
 @import "tailwindcss";
 
-/* ── Reset ─────────────────────────────────────────────────────────────── */
 *,
 *::before,
 *::after {
@@ -14,7 +12,6 @@ html {
   scroll-behavior: smooth;
 }
 
-/* ── Tokens ────────────────────────────────────────────────────────────── */
 :root {
   --bg: #09090b;
   --surf: #111113;
@@ -30,7 +27,6 @@ html {
   --glow: rgba(200, 241, 53, 0.12);
   --glow-strong: rgba(200, 241, 53, 0.35);
 
-  /* Code Syntax (Catppuccin Mocha based) */
   --code-fg: #cdd6f4;
   --code-cmt: #7f849c;
   --code-kw: #f38ba8;
@@ -62,7 +58,6 @@ body {
   line-height: 1.5;
 }
 
-/* ── Film grain overlay ────────────────────────────────────────────────── */
 body::after {
   content: "";
   position: fixed;
@@ -74,7 +69,6 @@ body::after {
   background-size: 180px;
 }
 
-/* ── Scroll progress bar ───────────────────────────────────────────────── */
 .scroll-progress {
   position: fixed;
   top: 0;
@@ -86,7 +80,6 @@ body::after {
   box-shadow: 0 0 12px var(--glow-strong);
 }
 
-/* ── Ambient cursor glow ───────────────────────────────────────────────── */
 .cursor-glow {
   position: fixed;
   width: 600px;
@@ -103,13 +96,11 @@ body::after {
   transition: opacity 0.4s ease;
 }
 
-/* ── Page ──────────────────────────────────────────────────────────────── */
 .page {
   position: relative;
   min-height: 100vh;
 }
 
-/* Tailwind v4-style dot grid background */
 .page::before {
   content: "";
   position: fixed;
@@ -129,7 +120,6 @@ body::after {
   );
 }
 
-/* Accent radial glow behind grid */
 .page::after {
   content: "";
   position: fixed;
@@ -181,7 +171,6 @@ body::after {
   padding: 0 40px;
 }
 
-/* ── Nav header (sticky wrapper) ───────────────────────────────────────── */
 .nav-header {
   position: sticky;
   top: 0;
@@ -293,7 +282,6 @@ body::after {
   transform: translateX(100%);
 }
 
-/* ── Hero ──────────────────────────────────────────────────────────────── */
 .hero {
   padding: 100px 0 80px;
   display: grid;
@@ -301,7 +289,7 @@ body::after {
   gap: 64px;
   align-items: flex-start;
   max-width: 100%;
-  min-height: 640px;
+  /* min-height: 680px; */
 }
 
 .eyebrow {
@@ -395,7 +383,6 @@ body::after {
   color: var(--text3);
 }
 
-/* ── Buttons ──────────────────────────────────────────────────────────── */
 .btn-primary {
   display: inline-flex;
   align-items: center;
@@ -500,9 +487,6 @@ body::after {
   background: var(--glow) !important;
 }
 
-/* Stats removed */
-
-/* ── Install strip ────────────────────────────────────────────────────── */
 .install {
   display: flex;
   align-items: stretch;
@@ -572,7 +556,6 @@ body::after {
   align-items: center;
 }
 
-/* ── Section head ─────────────────────────────────────────────────────── */
 .sec-head {
   margin-bottom: 40px;
 }
@@ -602,7 +585,6 @@ body::after {
   color: var(--accent2);
 }
 
-/* ── Filters ──────────────────────────────────────────────────────────── */
 .filters {
   display: flex;
   align-items: center;
@@ -618,7 +600,7 @@ body::after {
   text-transform: uppercase;
   letter-spacing: 0.1em;
   margin-right: 4px;
-  margin-top: -1px; /* Visual baseline fix */
+  margin-top: -1px;
 }
 
 .filter-btn {
@@ -649,7 +631,6 @@ body::after {
   box-shadow: 0 0 16px rgba(200, 241, 53, 0.06);
 }
 
-/* ── Grid ─────────────────────────────────────────────────────────────── */
 .grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -660,7 +641,6 @@ body::after {
   margin-bottom: 120px;
 }
 
-/* ── Card ─────────────────────────────────────────────────────────────── */
 .demo-card {
   background: var(--bg);
   padding: 28px 24px;
@@ -672,14 +652,33 @@ body::after {
     background 0.3s ease,
     box-shadow 0.3s ease;
   position: relative;
-  overflow: visible;
+  overflow: hidden;
   border-right: 1px solid var(--border);
   border-bottom: 1px solid var(--border);
   will-change: transform;
-  transform: translateZ(0); /* Force GPU acceleration */
+  transform: translateZ(0);
   backface-visibility: hidden;
   -webkit-font-smoothing: antialiased;
   min-height: 260px;
+  cursor: pointer;
+}
+
+.card-spotlight {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0;
+  transition: opacity 0.5s ease;
+}
+
+.demo-card:hover .card-spotlight {
+  opacity: 1;
+}
+
+.demo-card > *:not(.card-spotlight) {
+  position: relative;
+  z-index: 1;
 }
 
 .demo-card:nth-child(3n) {
@@ -807,7 +806,7 @@ body::after {
   transition: all 0.3s var(--ease-out-expo);
 }
 
-.card-title:hover {
+.demo-card:hover .card-title {
   color: var(--accent);
 }
 
@@ -827,7 +826,6 @@ body::after {
   margin-top: 4px;
 }
 
-/* ── Toast Preview ────────────────────────────────────────────────────── */
 .toast-preview {
   position: relative;
   display: flex;
@@ -966,7 +964,6 @@ body::after {
   box-shadow: 0 0 8px var(--glow);
 }
 
-/* ── Card Top Layout ──────────────────────────────────────────────────── */
 .card-top {
   display: flex;
   align-items: center;
@@ -1000,14 +997,17 @@ body::after {
   transition: all 0.25s var(--ease-out-expo);
 }
 
+.demo-card:hover .btn-impl-mini {
+  color: var(--text2);
+}
+
 .btn-impl-mini:hover {
   background: var(--accent-dim);
   border-color: rgba(200, 241, 53, 0.2);
-  color: var(--accent);
+  color: var(--accent) !important;
   box-shadow: 0 0 12px rgba(200, 241, 53, 0.08);
 }
 
-/* ── Footer ───────────────────────────────────────────────────────────── */
 .footer {
   border-top: 1px solid var(--border);
   padding: 40px 0 56px;
@@ -1022,7 +1022,7 @@ body::after {
   font-family: var(--mono);
   font-size: 11px;
   color: var(--text3);
-  line-height: inherit; /* Remove fixed line-height for better flex centering */
+  line-height: inherit;
 }
 
 .footer-l a {
@@ -1060,7 +1060,6 @@ body::after {
   gap: 16px;
 }
 
-/* Inline creator credit */
 .creator-inline {
   display: inline-flex;
   align-items: center;
@@ -1070,7 +1069,7 @@ body::after {
   color: var(--text3);
   text-decoration: none;
   transition: all 0.25s var(--ease-out-expo);
-  padding: 3px 10px 3px 4px; /* Balanced padding */
+  padding: 3px 10px 3px 4px;
   border-radius: 999px;
   border: 1px solid transparent;
 }
@@ -1095,7 +1094,6 @@ body::after {
   box-shadow: 0 0 10px rgba(200, 241, 53, 0.1);
 }
 
-/* GitHub star nav pill */
 .nav-pill-star {
   font-family: var(--mono);
   font-size: 13px;
@@ -1124,7 +1122,6 @@ body::after {
   height: 13px;
 }
 
-/* ── Modal ────────────────────────────────────────────────────────────── */
 .modal-overlay {
   position: fixed;
   inset: 0;
@@ -1167,7 +1164,6 @@ body::after {
   padding: 24px 28px;
   border-bottom: 1px solid var(--border);
   display: flex;
-  align-items: center;
   justify-content: space-between;
   background: rgba(19, 19, 20, 0.5);
   backdrop-filter: blur(8px);
@@ -1296,7 +1292,6 @@ body::after {
   border-bottom-right-radius: var(--r);
 }
 
-/* Custom scrollbar for modal steps */
 .modal-steps::-webkit-scrollbar {
   width: 6px;
 }
@@ -1368,7 +1363,6 @@ body::after {
   line-height: 1.6;
 }
 
-/* ── Code Tokens ─────────────────────────────────────────────────────── */
 .code-cmt {
   color: var(--code-cmt);
   font-style: italic;
@@ -1449,9 +1443,6 @@ body::after {
   }
 }
 
-/* ── Responsive ───────────────────────────────────────────────────────── */
-
-/* Tablet landscape / small desktop — hero single-col */
 @media (max-width: 1000px) {
   .hero {
     grid-template-columns: 1fr;
@@ -1463,7 +1454,6 @@ body::after {
   }
 }
 
-/* Tablet portrait — 2-column grid */
 @media (max-width: 880px) {
   .grid {
     grid-template-columns: repeat(2, 1fr);
@@ -1476,7 +1466,6 @@ body::after {
   }
 }
 
-/* Mobile — everything stacks */
 @media (max-width: 600px) {
   .wrap {
     padding: 0 20px;
@@ -1597,7 +1586,6 @@ body::after {
   }
 }
 
-/* Very small phones */
 @media (max-width: 380px) {
   .wrap {
     padding: 0 16px;

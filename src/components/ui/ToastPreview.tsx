@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "motion/react";
-import { Check, Trash2, Bell, Users, RefreshCw } from "lucide-react";
+import { Check, Bell, Users, RefreshCw, XIcon } from "lucide-react";
 
 type ToastType = "success" | "error" | "warning" | "info" | "loading";
 
@@ -17,69 +17,69 @@ interface ToastItem {
 const TOAST_POOL: Omit<ToastItem, "id">[] = [
   {
     type: "success",
-    title: "Deployment complete",
-    desc: "v2.0 is now live on Vercel",
+    title: "Deployment is live",
+    desc: "Your latest changes are now public",
     action: "View",
   },
   {
     type: "loading",
-    title: "Syncing workspace",
-    desc: "Processing 1,204 assets",
+    title: "Syncing your files",
+    desc: "Just a moment while we update everything",
     action: null,
   },
   {
     type: "error",
-    title: "Write permission denied",
-    desc: "Check your folder settings",
-    action: "Fix",
-  },
-  {
-    type: "warning",
-    title: "Low disk space",
-    desc: "92% of quota used",
-    action: "Upgrade",
-  },
-  {
-    type: "info",
-    title: "New collaborator",
-    desc: "User joined from Mumbai, IN",
-    action: "Reply",
-  },
-  {
-    type: "success",
-    title: "Payment successful",
-    desc: "$49.00 charged to Visa ••4444",
-    action: "Receipt",
-  },
-  {
-    type: "info",
-    title: "Update available",
-    desc: "Restart to apply v3.4.1",
-    action: "Update",
-  },
-  {
-    type: "warning",
-    title: "Offline mode",
-    desc: "Changes will sync when online",
+    title: "Could not save",
+    desc: "Check your connection and try again",
     action: "Retry",
   },
   {
+    type: "warning",
+    title: "Running low on space",
+    desc: "You have used most of your storage",
+    action: "Manage",
+  },
+  {
+    type: "info",
+    title: "New message received",
+    desc: "A teammate just left a comment",
+    action: "Read",
+  },
+  {
+    type: "success",
+    title: "Payment received",
+    desc: "Thank you for your purchase",
+    action: "Invoice",
+  },
+  {
+    type: "info",
+    title: "Updated to latest version",
+    desc: "New features have been added",
+    action: "Learn more",
+  },
+  {
+    type: "warning",
+    title: "Working offline",
+    desc: "Changes will sync when you are back online",
+    action: "Connect",
+  },
+  {
     type: "loading",
-    title: "Optimizing images",
-    desc: "Reducing bundle size by 14%",
+    title: "Optimizing your experience",
+    desc: "We are making things faster for you",
     action: null,
   },
   {
     type: "success",
-    title: "Invite sent",
-    desc: "Link copied to clipboard",
+    title: "Link copied",
+    desc: "Ready to share with your team",
     action: "Undo",
   },
 ];
 
 const TYPE_ICONS: Record<ToastType, React.ReactNode> = {
   success: <Check className="tp-icon size-4" />,
-  error: <Trash2 className="tp-icon size-4" />,
+  error: <XIcon className="tp-icon size-4" />,
   warning: <Bell className="tp-icon size-4" />,
   info: <Users className="tp-icon size-4" />,
   loading: <RefreshCw className="tp-icon animate-spin-slow size-4" />,
@@ -96,13 +96,11 @@ export function ToastPreview() {
     let intervalId: ReturnType<typeof setInterval>;
 
     const sequence = async () => {
-      // 1200ms initial delay for better user pacing after page load
-      await new Promise((r) => setTimeout(r, 1200));
+      await new Promise((r) => setTimeout(r, 800));
       if (!isMounted) return;
 
-      // 1. Arrival sequence
       for (let i = 0; i < 5; i++) {
-        if (i !== 0) await new Promise((r) => setTimeout(r, 800));
+        if (i !== 0) await new Promise((r) => setTimeout(r, 450));
         if (!isMounted) return;
 
         setToasts((prev) => {
@@ -113,12 +111,10 @@ export function ToastPreview() {
         });
       }
 
-      // 2. Expand pause
-      await new Promise((r) => setTimeout(r, 1000));
+      await new Promise((r) => setTimeout(r, 600));
       if (!isMounted) return;
       setIsExpanded(true);
 
-      // 3. Continuous Loop
       intervalId = setInterval(() => {
         if (!isMounted) return;
         setToasts((prev) => {
@@ -141,18 +137,18 @@ export function ToastPreview() {
     <div
       className={`toast-preview ${isExpanded ? "is-expanded" : "is-collapsed"}`}
     >
-      <div className="tp-label">live demonstration</div>
+      <div className="tp-label">interactive preview</div>
       <div
         className="tp-stack"
         style={{
           position: "relative",
-          minHeight: "390px",
+          minHeight: "395px",
         }}
       >
         <AnimatePresence mode="popLayout" initial={false}>
           {toasts.map((t, i) => {
             const total = toasts.length;
-            const posFromBottom = total - 1 - i; // Newest (at end) is 0
+            const posFromBottom = total - 1 - i;
 
             return (
               <motion.div

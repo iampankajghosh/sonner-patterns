@@ -16,7 +16,6 @@ export function PatternModal({ group, onClose }: PatternModalProps) {
   const panelRef = useRef<HTMLDivElement>(null);
   const [showMask, setShowMask] = useState(true);
 
-  // Lock scroll when modal is open
   useEffect(() => {
     if (group) {
       document.body.style.overflow = "hidden";
@@ -26,7 +25,6 @@ export function PatternModal({ group, onClose }: PatternModalProps) {
     };
   }, [group]);
 
-  // Close on Escape
   useEffect(() => {
     const handleKey = (e: KeyboardEvent) => {
       if (e.key === "Escape") onClose();
@@ -35,7 +33,6 @@ export function PatternModal({ group, onClose }: PatternModalProps) {
     return () => window.removeEventListener("keydown", handleKey);
   }, [onClose]);
 
-  // Close on backdrop click
   const handleBackdropClick = useCallback(
     (e: React.MouseEvent) => {
       if (e.target === overlayRef.current) onClose();
@@ -59,16 +56,13 @@ export function PatternModal({ group, onClose }: PatternModalProps) {
         >
           <motion.div
             ref={panelRef}
+            layoutId={`modal-${group.id}`}
             className="modal-panel"
-            initial={{ opacity: 0, y: 40, scale: 0.96 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: 20, scale: 0.97 }}
             transition={{
               duration: 0.35,
               ease: [0.22, 1, 0.36, 1],
             }}
           >
-            {/* Header */}
             <div className="modal-header">
               <div className="modal-header-left">
                 <div
@@ -102,10 +96,8 @@ export function PatternModal({ group, onClose }: PatternModalProps) {
               </button>
             </div>
 
-            {/* Description */}
             <p className="modal-desc">{group.desc}</p>
 
-            {/* Setup import */}
             {patternData.setup && (
               <div className="modal-setup">
                 <div className="modal-setup-label">
@@ -116,7 +108,6 @@ export function PatternModal({ group, onClose }: PatternModalProps) {
               </div>
             )}
 
-            {/* Steps */}
             <div
               className="modal-steps"
               onScroll={(e) => {
@@ -142,7 +133,6 @@ export function PatternModal({ group, onClose }: PatternModalProps) {
               ))}
             </div>
 
-            {/* Bottom Mask */}
             <AnimatePresence>
               {showMask && (
                 <motion.div
@@ -161,7 +151,6 @@ export function PatternModal({ group, onClose }: PatternModalProps) {
   );
 }
 
-/* ── Code block with copy button ────────────────────────────────────── */
 function CodeBlock({ code }: { code: string }) {
   const [copied, setCopied] = useState(false);
 
@@ -246,14 +235,12 @@ const highlight = (code: string) => {
   let match;
 
   while ((match = combinedRegex.exec(code)) !== null) {
-    // Add text before the match
     const before = code.slice(lastIndex, match.index);
     html += before
       .replace(/&/g, "&amp;")
       .replace(/</g, "&lt;")
       .replace(/>/g, "&gt;");
 
-    // Identify which token matched
     let tokenName = "";
     for (let i = 0; i < tokens.length; i++) {
       if (match[i + 1] !== undefined) {
@@ -269,7 +256,6 @@ const highlight = (code: string) => {
       .replace(/>/g, "&gt;");
 
     if (tokenName) {
-      // Basic punctuation shouldn't be colored as operators sometimes
       if (
         tokenName === "op" &&
         matchedText.length === 1 &&
@@ -286,7 +272,6 @@ const highlight = (code: string) => {
     lastIndex = combinedRegex.lastIndex;
   }
 
-  // Add remaining text
   html += code
     .slice(lastIndex)
     .replace(/&/g, "&amp;")
