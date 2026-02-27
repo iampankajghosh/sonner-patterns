@@ -96,11 +96,11 @@ export function ToastPreview() {
     let intervalId: ReturnType<typeof setInterval>;
 
     const sequence = async () => {
-      await new Promise((r) => setTimeout(r, 800));
+      await new Promise((r) => setTimeout(r, 400));
       if (!isMounted) return;
 
       for (let i = 0; i < 5; i++) {
-        if (i !== 0) await new Promise((r) => setTimeout(r, 450));
+        if (i !== 0) await new Promise((r) => setTimeout(r, 300));
         if (!isMounted) return;
 
         setToasts((prev) => {
@@ -111,7 +111,7 @@ export function ToastPreview() {
         });
       }
 
-      await new Promise((r) => setTimeout(r, 600));
+      await new Promise((r) => setTimeout(r, 400));
       if (!isMounted) return;
       setIsExpanded(true);
 

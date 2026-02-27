@@ -39,8 +39,8 @@ export function Hero() {
             initial={{ opacity: 0, y: 16, filter: "blur(8px)" }}
             animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
             transition={{
-              duration: 0.65,
-              delay: 0.8,
+              duration: 0.5,
+              delay: 0.6,
               ease: [0.22, 1, 0.36, 1],
             }}
           >
@@ -52,7 +52,7 @@ export function Hero() {
           className="hero-body"
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.55, delay: 0.85, ease: [0.22, 1, 0.36, 1] }}
+          transition={{ duration: 0.5, delay: 0.65, ease: [0.22, 1, 0.36, 1] }}
         >
           A curated collection of <strong>24 essential patterns</strong> for
           Sonner. I built this to help you handle everything from simple alerts
@@ -63,7 +63,7 @@ export function Hero() {
           className="hero-row"
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 1.0, ease: [0.22, 1, 0.36, 1] }}
+          transition={{ duration: 0.5, delay: 0.75, ease: [0.22, 1, 0.36, 1] }}
         >
           <MagneticButton variant="primary" onClick={basicVariants}>
             <Sparkles className="size-4" />

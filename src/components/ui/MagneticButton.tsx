@@ -80,8 +80,9 @@ export function MagneticButton({
           initial={{ opacity: 0, scale: 0.8 }}
           animate={{ opacity: 1, scale: 1 }}
           style={{ display: "inline-flex", alignItems: "center", gap: 4 }}
+          aria-live="polite"
         >
-          <Check className="size-3" /> fired
+          <Check className="size-3" aria-hidden="true" /> fired
         </motion.span>
       ) : (
         children

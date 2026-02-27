@@ -17,8 +17,8 @@ export function RevealWords({ text, delay = 0 }: RevealWordsProps) {
           initial={{ opacity: 0, y: 14, filter: "blur(8px)" }}
           animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
           transition={{
-            duration: 0.55,
-            delay: delay + i * 0.08,
+            duration: 0.4,
+            delay: delay + i * 0.05,
             ease: [0.22, 1, 0.36, 1],
           }}
           style={{

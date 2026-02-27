@@ -18,9 +18,20 @@ export function Logo() {
       className="logo"
       whileHover={{ x: 2 }}
       transition={{ type: "spring", stiffness: 300, damping: 20 }}
+      role="img"
+      aria-label="Sonner Patterns"
+      title="Sonner Patterns"
     >
       <div className="logo-pip" />
-      <div style={{ position: "relative", height: "14px", overflow: "hidden", display: "flex", alignItems: "center" }}>
+      <div
+        style={{
+          position: "relative",
+          height: "14px",
+          overflow: "hidden",
+          display: "flex",
+          alignItems: "center",
+        }}
+      >
         <AnimatePresence mode="wait">
           <motion.span
             key={isHindi ? "hi" : "en"}

@@ -13,9 +13,7 @@ export function Footer() {
     >
       <div className="footer-l">
         Add{" "}
-        <span
-          style={{ color: "var(--accent2)", fontFamily: "var(--mono)" }}
-        >
+        <span style={{ color: "var(--accent2)", fontFamily: "var(--mono)" }}>
           &lt;Toaster /&gt;
         </span>{" "}
         to enable toasts site-wide. Built on{" "}
@@ -40,6 +38,10 @@ export function Footer() {
             src="https://avatars.githubusercontent.com/u/140588883?v=4"
             alt="Pankaj Ghosh"
             className="creator-avatar"
+            width="24"
+            height="24"
+            loading="lazy"
+            decoding="async"
           />
           <span>Pankaj Ghosh</span>
         </a>

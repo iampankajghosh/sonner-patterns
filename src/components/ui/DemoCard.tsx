@@ -33,8 +33,12 @@ export function DemoCard({ group, index, onOpen }: DemoCardProps) {
   const handleMouseMove = (e: React.MouseEvent) => {
     if (!ref.current) return;
     const rect = ref.current.getBoundingClientRect();
-    cardX.set((e.clientX - rect.left) / rect.width - 0.5);
-    cardY.set((e.clientY - rect.top) / rect.height - 0.5);
+    const x = (e.clientX - rect.left) / rect.width - 0.5;
+    const y = (e.clientY - rect.top) / rect.height - 0.5;
+    cardX.set(x);
+    cardY.set(y);
+    ref.current.style.setProperty("--mouse-x", `${(x + 0.5) * 100}%`);
+    ref.current.style.setProperty("--mouse-y", `${(y + 0.5) * 100}%`);
   };
 
   const handleMouseLeave = () => {
@@ -70,14 +74,10 @@ export function DemoCard({ group, index, onOpen }: DemoCardProps) {
         }
       }}
     >
-      <motion.div
+      <div
         className="card-spotlight"
         style={{
-          background: useTransform(
-            [cardX, cardY],
-            ([x, y]) =>
-              `radial-gradient(400px circle at ${(Number(x) + 0.5) * 100}% ${(Number(y) + 0.5) * 100}%, rgba(200, 241, 53, 0.08), transparent)`,
-          ),
+          background: `radial-gradient(400px circle at var(--mouse-x, 50%) var(--mouse-y, 50%), rgba(200, 241, 53, 0.08), transparent)`,
         }}
       />
       <div className="card-top">

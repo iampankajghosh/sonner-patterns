@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { DemoCard } from "../ui/DemoCard";
 import { CopyButton } from "../ui/CopyButton";
@@ -21,13 +21,20 @@ export function FilterGrid({
   const [isFirstRender, setIsFirstRender] = useState(true);
 
   useEffect(() => {
-    const timer = setTimeout(() => setIsFirstRender(false), 1500);
+    const timer = setTimeout(() => setIsFirstRender(false), 1000);
     return () => clearTimeout(timer);
   }, []);
 
-  const tags = ["all", ...Array.from(new Set(GROUPS.map((g) => g.tag)))];
-  const filtered =
-    filter === "all" ? [...GROUPS] : GROUPS.filter((g) => g.tag === filter);
+  const tags = useMemo(
+    () => ["all", ...Array.from(new Set(GROUPS.map((g) => g.tag)))],
+    [],
+  );
+
+  const filtered = useMemo(
+    () =>
+      filter === "all" ? [...GROUPS] : GROUPS.filter((g) => g.tag === filter),
+    [filter],
+  );
 
   return (
     <>
@@ -35,7 +42,7 @@ export function FilterGrid({
         className="install"
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5, delay: 0.9, ease: [0.22, 1, 0.36, 1] }}
+        transition={{ duration: 0.5, delay: 0.5, ease: [0.22, 1, 0.36, 1] }}
       >
         <span className="install-lbl">install</span>
         <code className="install-cmd">
@@ -51,13 +58,13 @@ export function FilterGrid({
         className="sec-head"
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5, delay: 1.05, ease: [0.22, 1, 0.36, 1] }}
+        transition={{ duration: 0.5, delay: 0.6, ease: [0.22, 1, 0.36, 1] }}
       >
         <motion.div
           className="sec-tag"
           initial={{ opacity: 0, x: -10 }}
           animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.4, delay: 1.15 }}
+          transition={{ duration: 0.4, delay: 0.7 }}
         >
           {"interactive playground"}
         </motion.div>
@@ -68,7 +75,7 @@ export function FilterGrid({
         className="filters"
         initial={{ opacity: 0, y: 12 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.45, delay: 1.2 }}
+        transition={{ duration: 0.45, delay: 0.75 }}
       >
         <span className="filter-lbl">filter:</span>
         {tags.map((t) => (
@@ -108,7 +115,7 @@ export function FilterGrid({
           exit={{ opacity: 0, y: -8 }}
           transition={{
             duration: 0.3,
-            delay: isFirstRender ? 1.3 : 0,
+            delay: isFirstRender ? 0.8 : 0,
             ease: [0.22, 1, 0.36, 1],
           }}
         >
