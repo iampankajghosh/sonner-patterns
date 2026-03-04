@@ -33,6 +33,42 @@ import {
 let _seq = 0;
 const seq = (fn: () => void, delay = 0) => setTimeout(fn, _seq++ * 380 + delay);
 
+// Array of all available toast demo functions
+const allToastDemos = [
+  basicVariants,
+  withDescription,
+  customDuration,
+  promiseToast,
+  promiseWithDescription,
+  actionToasts,
+  cancelToasts,
+  customJsxButtons,
+  loadingThenSuccess,
+  loadingThenError,
+  dismissAll,
+  updateInPlace,
+  customIcons,
+  realWorldAuth,
+  realWorldNetwork,
+  realWorldEcommerce,
+  realWorldCollaboration,
+  errorWithRetry,
+  multiStepSignup,
+  multiStepCheckout,
+  keyboardHint,
+  rateLimitToasts,
+  backgroundJob,
+  onboardingNudge,
+  settingsSaved,
+];
+
+// Function to trigger a random toast pattern
+export function randomToastPattern() {
+  const randomIndex = Math.floor(Math.random() * allToastDemos.length);
+  const randomDemo = allToastDemos[randomIndex];
+  randomDemo();
+}
+
 export function basicVariants() {
   _seq = 0;
   seq(() => toast("Simple alert to keep you informed"));

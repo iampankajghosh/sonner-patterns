@@ -5,7 +5,7 @@ import { Zap, Sparkles } from "lucide-react";
 import { RevealWords } from "../ui/RevealWords";
 import { ToastPreview } from "../ui/ToastPreview";
 import { MagneticButton } from "../ui/MagneticButton";
-import { basicVariants } from "../../lib/toast-demos";
+import { randomToastPattern } from "../../lib/toast-demos";
 import { usePostHog } from "@posthog/react";
 
 export function Hero() {
@@ -71,10 +71,10 @@ export function Hero() {
           <MagneticButton
             variant="primary"
             onClick={() => {
-              basicVariants();
+              randomToastPattern();
               posthog.capture("hero_demo_triggered", {
-                pattern_id: "01",
-                pattern_label: "Core Variants",
+                pattern_id: "random",
+                pattern_label: "Random Pattern",
                 trigger_location: "hero",
               });
             }}
